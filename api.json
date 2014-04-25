@@ -19,7 +19,7 @@
           {
             "name": "key",
             "type": "string",
-            "description": "クラウド上のPeerServerを利用するためのAPIキーです。<span class='warn'>クラウド上のPeerServerは9000番ポートで動作します。9000番ポートがブロックされていないか確かめてください。または、自身でのPeerServer運用を検討してください。</span>"
+            "description": "クラウド上のPeerServerを利用するためのAPIキーです。"
           },
           {
             "name": "host",
@@ -29,7 +29,7 @@
           {
             "name": "port",
             "type": "number",
-            "description": "サーバのポート番号です。デフォルトは <code>80</code>番です。"
+            "description": "サーバのポート番号です。デフォルトはホストがskyway.ioの場合は<code>443</code>番で、その他の場合は<code>80</code>番です。"
           },
           {
             "name": "path",
@@ -40,12 +40,12 @@
             "name": "secure",
             "type": "boolean",
             "tags": ["beta (0.3.0)"],
-            "description": "SSLを利用する場合は <code>true</code> です。<span class='tip'>私達のクラウド上のサーバは、SSLをサポートしていません。</span>"
+            "description": "skyway.ioを利用する場合は、デフォルトは <code>true</code> であり、<code>true</code>が必須です。"
           },
           {
             "name": "config",
             "type": "object",
-            "description": "RTCPeerConnectionへ渡される設定項目のハッシュです。このハッシュは、カスタマイズされたICE/TURNサーバを含みます。デフォルト値は、<code>{ 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] }</code>です。"
+            "description": "RTCPeerConnectionへ渡される設定項目のハッシュです。このハッシュは、カスタマイズされたICE/TURNサーバを含みます。デフォルト値は、<code>{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }</code>です。"
           },
           {
             "name": "debug",
