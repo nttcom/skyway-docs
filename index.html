@@ -90,19 +90,19 @@ var call = peer.call('dest-peer-id',
       <p>詳しくは <a href="#mediaconnection">MediaConnection API reference</a> をご覧ください。</p>
 
       <h2>SkyWay RestAPIの使い方</h2>
-      <h3>/active/list/<APIKEY></h3>
+      <h3>/v2/active/list/<APIKEY></h3>
       <p>APIキー毎のアクティブなPeerIDを取得します。<p>
       <pre>
-  Request : https://skyway.io/active/list/APIKEY
+  Request : https://skyway.io/v2/active/list/APIKEY
   Response : [peerid1,peerid2,peerid3,peerid4,.....]</pre>
-      <h3>/active/count/<APIKEY></h3>
+      <h3>/v2/active/count/<APIKEY></h3>
       <p>APIキー毎のアクティブなPeerIDの数を取得します。<p>
       <pre>
-  Request : https://skyway.io/active/count/APIKEY
+  Request : https://skyway.io/v2/active/count/APIKEY
   Response : {"name":"active_session","count":0,"api_key":"APIKEY"}</pre>
 
       <p>SkyWay WebAPIはAPIキー申請時に申請していただいたドメインからのみアクセスが可能です。</p>
-
+      <p>注意：古いライブラリを利用している場合は"/v2"を除いて利用ください。</p>
       <h2>FAQ</h2>
 
         <h3>どのような種類のデータを送ることができますか？</h3>
