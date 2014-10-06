@@ -17,7 +17,7 @@
       <h2>セットアップ</h2>
       <h3>1. PeerJSのクライアントライブラリをインクルード</h3>
       <p>PeerJSクライアントライブラリをあなたのアプリケーションにインクルードしてください。</p>
-      <pre>&lt;script src="https://skyway.io/dist/v2/0.3/peer.js"&gt;&lt;/script&gt;</pre>
+      <pre>&lt;script src="https://skyway.io/dist/0.3/peer.js"&gt;&lt;/script&gt;</pre>
       <p>PeerJSライブラリ（<a download href="https://skyway.io/dist/0.3/peer.js">peer.js</a>, <a download href="https://skyway.io/dist/0.3/peer.min.js">peer.min.js</a>）はあなたのサーバ上に設置することができます。
       ソースコードは<a href="https://github.com/nttcom/peerjs">Githubからfork</a>する事ができます。</p>
       <h3>2. Peerオブジェクトを作成</h3>
@@ -90,19 +90,19 @@ var call = peer.call('dest-peer-id',
       <p>詳しくは <a href="#mediaconnection">MediaConnection API reference</a> をご覧ください。</p>
 
       <h2>SkyWay RestAPIの使い方</h2>
-      <h3>/v2/active/list/<APIKEY></h3>
+      <h3>listAllPeers()<APIKEY></h3>
       <p>APIキー毎のアクティブなPeerIDを取得します。<p>
-      <pre>
-  Request : https://skyway.io/v2/active/list/APIKEY
-  Response : [peerid1,peerid2,peerid3,peerid4,.....]</pre>
-      <h3>/v2/active/count/<APIKEY></h3>
-      <p>APIキー毎のアクティブなPeerIDの数を取得します。<p>
-      <pre>
-  Request : https://skyway.io/v2/active/count/APIKEY
-  Response : {"name":"active_session","count":0,"api_key":"APIKEY"}</pre>
+      <pre>peer.listAllPeers(function(list){
+      //（例）取得したPeerIDリストを配列に格納する
+    for(var cnt = 0;cnt < list.length;cnt++){
+        userList.push(list[cnt]);
+    }
+});
+</pre>
 
-      <p>SkyWay WebAPIはAPIキー申請時に申請していただいたドメインからのみアクセスが可能です。</p>
-      <p>注意：古いライブラリを利用している場合は"/v2"を除いて利用ください。</p>
+
+      <p>SkyWay RestAPIはAPIキー申請時に申請していただいたドメインからのみアクセスが可能です。</p>
+
       <h2>FAQ</h2>
 
         <h3>どのような種類のデータを送ることができますか？</h3>
@@ -138,7 +138,7 @@ var peer = new Peer({
 
         <h3>接続しようとしてるピアに接続できない場合はどうなりますか？</h3>
 
-          <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。尚、SkyWayは現時点ではこの機能に対応していません。</p>
+          <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。</p>
 
         <h3>ピアとつながらない場合は何を確認するべきでしょうか？</h3>
           <p>ピア同士がシンメトリックNATの内側にいる可能性があります。この場合はTURNサーバを利用してください。</p>
@@ -146,8 +146,9 @@ var peer = new Peer({
 
         <h3>遅延／帯域幅は?</h3>
           <p>ピア同士のデータのやり取りはサーバを経由しないため、それが原因となる遅延などは発生しません。ピア同士の処理性能やネットワーク環境に依存します。</p>
-          <p>ピア同士のコネクション確立に関する遅延は、セッション情報の中継（以下、シグナリング）とユーザの識別という2つに分類できます。PeerJSでは、シグナリングの時間を短縮するために、XHRストリーミングリクエストでデータを送った後、WebSocketで送ります。ユーザの識別に関しては手動でIDを指定することで、サーバ側にてIDを生成する際のRTT（Round-Trip delay Time）を短縮することができます。尚、SkyWayに関してはXHRでの接続に現時点では対応していません。</p>
+          <p>ピア同士のコネクション確立に関する遅延は、セッション情報の中継（以下、シグナリング）とユーザの識別という2つに分類できます。PeerJSでは、シグナリングの時間を短縮するために、XHRストリーミングリクエストでデータを送った後、WebSocketで送ります。ユーザの識別に関しては手動でIDを指定することで、サーバ側にてIDを生成する際のRTT（Round-Trip delay Time）を短縮することができます。</p>
         <h3>その他</h3>
+          <p><a href="https://groups.google.com/forum/#!forum/skywayjs">SkyWay Technical Forum Google Group(日本語/英語)</a></p>
           <p><a href="https://groups.google.com/forum/?fromgroups#!forum/peerjs">PeerJS Google Group(英語のみ)</a></p>
       <h3>免責事項</h3>
       <p>本ドキュメントは<a href="http://peerjs.com/docs/">http://peerjs.com/docs/</a>を元に、NTTコミュニケーションズが提供するSkyWayを利用するための情報等を追記し公開しています。ドキュメント原本に関する個別問い合わせには応じることができませんので、予めご了承ください。</p>
