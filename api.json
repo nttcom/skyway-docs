@@ -414,7 +414,7 @@
             "name": "'close'",
             "type": "event",
             "snippet": "mediaConnection.on('close', function() { ... });",
-            "description": "あなたかリモートのpeerがmedia connectionをクローズしたおきに発生します。<span class='warn'>Firefoxはこのイベントをまだサポートしていません。</span>"
+            "description": "あなたかリモートのpeerがmedia connectionをクローズした時に発生します。<span class='warn'>Firefoxはこのイベントをまだサポートしていません。</span>"
           },
           {
             "name": "'error'",
