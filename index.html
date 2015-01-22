@@ -120,8 +120,7 @@ conn.send({
     <h3>PeerJSを利用することができないシーンはありますか？</h3>
 
     <p>シンメトリックNATの内側にいるクライアント同士はNATを超えることができないため、通信することができません。
-        ただし、TURNサーバを利用して接続を中継すれば回避することができます。必要であれば、SkyWayが提供するTURNサーバを利用するか別途用意してください。SkyWayが提供するTURNサーバを利用する場合は別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。</p>
-    <p>TURNサーバの情報は、<code>Peer</code>オブジェクトのオプションで指定することができます。尚、SkyWayが提供するTURNサーバを利用する場合は、オプションでの指定は不要です。</p>
+        ただし、TURNサーバを利用して接続を中継すれば回避することができます。必要であれば、SkyWayが提供するTURNサーバを利用するか別途用意してください。SkyWayが提供するTURNサーバを利用する場合は別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。TURNサーバの情報は、<code>Peer</code>オブジェクトのオプションで設定することができます。</p>
     <h3>TURNサーバはどのようにして利用するのでしょうか？</h3>
     <p>Peerオブジェクトを生成する際、オプションのiceServersにURL等の情報を設定してください。</p>
 <pre>
@@ -132,6 +131,7 @@ var peer = new Peer({
   ]} /* Sample servers, please use appropriate ones */
 });
 </pre>
+    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、オプションの設定は不要です。</p>
     <h3>現在のブラウザ対応状況は?</h3>
 
     　<p>WebRTC仕様との互換性並びにブラウザの対応状況は<a href="http://peerjs.com/status">こちら</a>をご覧ください。尚、SkyWay対応版のPeerJSについては、動作に差異がある可能性があります。</p>
