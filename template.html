@@ -11,7 +11,7 @@
 
 <body>
 <section class="start">
-    <h1><a href="/skyway/">PeerJS</a> <span class="title">docs</span><span class="title">SkyWay対応版</span></h1>
+    <h1><a href="/skyway/">PeerJS</a> <span class="title">docs</span><span class="title skyway">SkyWay対応版</span></h1>
     <p><br>PeerJSは、WebRTCを利用したピア·ツー·ピアのデータ、ビデオ、オーディオ通信を簡単に実現することができます。このドキュメントでは、PeerJS APIの基本的な使い方を紹介します。PeerJSを用いた実装例をご覧になりたい方は, <a href="https://github.com/nttcom/peerjs/tree/master/examples">サンプル</a> ページを御覧ください。</P>
     <p>このドキュメントは、NTTコミュニケーションズが提供する<a href="http://nttcom.github.io/skyway/">クラウドサービス「SkyWay」</a>にて利用できるようにカスタマイズした<a href="https://github.com/nttcom/peerjs">PeerJS</a>を対象としています。</p>
     <h2>セットアップ</h2>
@@ -120,8 +120,8 @@ conn.send({
     <h3>PeerJSを利用することができないシーンはありますか？</h3>
 
     <p>シンメトリックNATの内側にいるクライアント同士はNATを超えることができないため、通信することができません。
-        ただし、TURNサーバを利用して接続を中継すれば回避することができます。TURNサーバは提供していないため必要であれば別途用意してください。
-        TURNサーバの情報は、<code>Peer</code>オブジェクトのオプションで指定することができます。</p>
+        ただし、TURNサーバを利用して接続を中継すれば回避することができます。必要であれば、SkyWayが提供するTURNサーバを利用するか別途用意してください。SkyWayが提供するTURNサーバを利用する場合は別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。</p>
+    <p>TURNサーバの情報は、<code>Peer</code>オブジェクトのオプションで指定することができます。尚、SkyWayが提供するTURNサーバを利用する場合は、オプションでの指定は不要です。</p>
     <h3>TURNサーバはどのようにして利用するのでしょうか？</h3>
     <p>Peerオブジェクトを生成する際、オプションのiceServersにURL等の情報を設定してください。</p>
 <pre>
