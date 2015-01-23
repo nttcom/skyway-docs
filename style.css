@@ -157,6 +157,10 @@ h1 .title {
   text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
 }
 
+h1 .skyway {
+  background-color: #01b169;
+}
+
 .start > p, .start > div {
   padding: 5px 30px 5px 40px;
   border-left: 4px solid #ddd;
@@ -268,6 +272,10 @@ a:hover {
 
 .tag.beta_030 {
   background-color: #E96151;
+}
+
+.tag.skyway {
+  background-color: #01b169;
 }
 
 .tag.method, .tag.function {
