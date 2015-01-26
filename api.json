@@ -40,12 +40,18 @@
             "name": "secure",
             "type": "boolean",
             "tags": ["beta (0.3.0)"],
-            "description": "skyway.ioを利用する場合は、デフォルトは <code>true</code> であり、<code>true</code>が必須です。"
+            "description": "SSLを利用する場合は、<code>true</code>にします。skyway.ioはSSLを利用するため、デフォルトは、<code>true</code>です。"
+          },
+          {
+            "name": "turn",
+            "type": "boolean",
+            "tags": ["skyway"],
+            "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>true</code>にします。デフォルトは、<code>true</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
           },
           {
             "name": "config",
             "type": "object",
-            "description": "RTCPeerConnectionへ渡される設定項目のハッシュです。このハッシュは、カスタマイズされたICE/TURNサーバを含みます。デフォルト値は、<code>{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }</code>です。"
+            "description": "RTCPeerConnectionへ渡される設定項目のハッシュです。このハッシュは、カスタマイズされたICE/TURNサーバを含みます。デフォルト値は、<code>{ 'iceServers': [{ 'url': 'stun:stun.skyway.io:3478' }] }</code>です。尚、SkyWayが提供するTURNサーバを利用する場合は、<code>iceServers</code>の指定は不要です。"
           },
           {
             "name": "debug",
@@ -121,7 +127,7 @@
     "tags": ["beta (0.3.0)"],
     "type": "method",
     "snippet": "var <a href='#mediaconnection'>mediaConnection</a> = peer.call(id, stream);",
-    "description": "idで指定されたリモートのpeerへ発信し、media connectionを返します。コネクションに失敗した場合に備え、<a href='#peeron-error'><code>error</code></a>イベントを設定してください。",
+    "description": "<code>id</code>で指定されたリモートのpeerへ発信し、media connectionを返します。コネクションに失敗した場合に備え、<a href='#peeron-error'><code>error</code></a>イベントを設定してください。",
     "children": [
       {
         "name": "id",
@@ -243,6 +249,14 @@
     "type": "method",
     "snippet": "peer.destroy();",
     "description": "サーバへの接続をクローズし、すべての既存のコネクションを終了します。<a href='#peerdestroyed'><code>peer.destroyed</code></a>は<code>true</code>に設定されます。<span class='warn'>この操作は必ず実施してください。それぞれのPeerオブジェクトが利用不可能、またはコネクションを受信できません。idも（クラウド上の）サーバに没収されます。さらに、データコネクション・メディアコネクションもクローズされます。</span>"
+  },
+
+  {
+    "name": "peer.listAllPeers",
+    "tags": ["skyway"],
+    "type": "method",
+    "snippet": "peer.listAllPeers(function(list) { ... });",
+    "description": "SkyWayが提供するRestAPIにアクセスし、APIキー毎のアクティブなPeerIDを取得します。listはArray形式で得られます。"
   },
 
   {
@@ -414,7 +428,7 @@
             "name": "'close'",
             "type": "event",
             "snippet": "mediaConnection.on('close', function() { ... });",
-            "description": "あなたかリモートのpeerがmedia connectionをクローズしたおきに発生します。<span class='warn'>Firefoxはこのイベントをまだサポートしていません。</span>"
+            "description": "あなたかリモートのpeerがmedia connectionをクローズした時に発生します。<span class='warn'>Firefoxはこのイベントをまだサポートしていません。</span>"
           },
           {
             "name": "'error'",
