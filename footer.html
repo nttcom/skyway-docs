@@ -1,0 +1,40 @@
+</div>
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-46095916-2', 'nttcom.github.io');
+    ga('send', 'pageview');
+
+</script>
+
+<script type="text/javascript">
+
+$(window).load(function(){
+  $('#tab-content > div').hide();
+  $('#tab a').click(function () {
+    $('#tab-content > div').hide().filter(this.hash).show(); //アンカー要素を表示
+
+    $('#tab a').removeClass('active');
+    $(this).addClass('active');
+
+    return false; //いれてないとアンカーリンクになる
+  }).filter(':eq(0)').click();
+  var hash = window.location.hash;
+  if(hash.match("#iOS-")){
+  	$('#tab a[href="#iOS"]').trigger("click");
+  	$('a[href="' + hash + '"]').trigger("click");
+  }else if(hash.match("#Android-")){
+	$('#tab a[href="#Android"]').trigger("click");
+	$('a[href="' + hash + '"]').trigger("click");
+  }else{
+  	$('#tab a[href="' + hash + '"]').trigger("click");
+  }
+})
+
+</script>
+</body>
+</html>

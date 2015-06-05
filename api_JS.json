@@ -292,10 +292,10 @@
         "name": ".send",
         "type": "method",
         "snippet": "dataConnection.send(data);",
-        "description": "デフォルトで、<code>data</code> はBinaryPackでシリアライズされて、リモートのピアで送信されます。",
+        "description": "デフォルトで、<code>data</code> はBinaryPackでシリアライズされて、リモートのピアで送信されます。serializationの値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。",
         "children": {
           "name": "data",
-          "description": "オブジェクト、strings、blobsなどのどんなデータ形式でも送信可能です。"
+          "description": "送信するデータです。"
         }
       },
       {

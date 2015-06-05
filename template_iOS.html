@@ -1,0 +1,187 @@
+<div id="iOS">
+<section class="start">
+    <h1><a href="/skyway/">SkyWay iOS SDK</a> <span class="title">docs</span></h1>
+    <p><br>SkyWayは、WebRTCを利用したピア·ツー·ピアのデータ、ビデオ、オーディオ通信を簡単に実現することができます。「SkyWay iOS SDK」はSkyWayをiOSから利用できるフレームワークです。このドキュメントでは、SkyWay iOS SDKの基本的な使い方を紹介します。SkyWay iOS SDKを用いた実装例をご覧になりたい方は, <a href="https://github.com/nttcom/SkyWay-iOS-Sample">サンプルアプリ</a> を御覧ください。</P>
+    <h2>セットアップ</h2>
+    <h3>1. 必要なライブラリ、フレームワークを追加</h3>
+    <p>下記のライブラリ、フレームワークをXcodeプロジェクトに追加してください。</p>
+    <pre>AudioToolbox.framework
+AVFoundation.framework
+CoreMedia.framework
+CoreGraphoics.framework
+Foundation.framework
+GLKit.framework
+SystemConfiguration.framework
+libc++.dylib
+libstdc++.6.0.9.dylib
+libsqlite3.dylib
+libicucore.dylib</pre>
+    <h3>2. SkyWay iOS SDKのインポート</h3>
+    <p>SkyWay.frameworkをXcodeプロジェクトに追加後、SkyWay iOS SDKのヘッダファイルをインポートしてください。</p>
+    <pre>#import &lt;SkyWay/SKWPeer.h&gt;</pre>
+    <h3>3. SKWPeerオブジェクトを作成</h3>
+    <p>SKWPeerオブジェクトは、Peerコネクションを生成、受信する為に利用します。</p>
+    <pre>SKWPeerOption* options = [[SKWPeerOption alloc] init];
+options.key = @"{APIKEY}";
+options.domain = @”{DOMAIN}”;
+SKWPeer* peer = [[SKWPeer alloc] initWithOptions:options];</pre>
+    <p>SKWPeerのコンストラクタに渡す'APIKEY'は、SkyWayのAPIキーです。<a
+            href="http://nttcom.github.io/skyway/registration.html">APIキーの申し込み</a>を行うことで無料で取得することができます。APIキー申込時には利用ドメインを申請していただきます。APIキーは申請したドメインからのみ利用可能です。</p>
+
+    <p>セッション情報交換やシグナリングに利用するサーバを、自身で構築することもできます。
+        詳しくは<a href="http://github.com/peers/peerjs-server">peerjs-server</a>をご覧ください。</p>
+    <p>これで利用するための準備はすべて整いました！</p>
+
+    <h2>使い方</h2>
+    <p>SKWPeerオブジェクトは生成時、ランダムなID（以下、PeerID）が付与されます。</p>
+      <pre>[peer on:SKW_PEER_EVENT_OPEN callback:^(NSObject* obj)
+{
+    if (YES == [obj isKindOfClass:[NSString class]])
+    {
+        NSString* ownId = (NSString *)obj;
+    }
+}];</pre>
+    <p>他のPeerと接続したい場合は、接続先のPeerIDが必要になります。
+        SKWPeerクラスの<a href="#skwpeer-listallpeers">listAllPeers</a>メソッドを用いて接続先のPeerIDを入手するか、何らかの仕組みでPeerIDを交換してください。<a href="#skwpeer">SKWPeerコンストラクタ</a>のオプションに任意のPeerIDを指定する事もできます</p>
+
+    <p>その他の<a href="#skwpeeroption">オプション</a>、メソッド、<a href="#skwpeer-on">イベント</a>、<a href="#skwpeer-on-event-skw_peer_event_error">エラー処理</a>などの詳細は、<a href="#skwpeer">Peer API リファレンス</a>をお読みください。</p>
+
+    <h3>Data connections</h3>
+    <p>相手のPeerIDを指定してSKWPeerの<code>connectWithId</code>メソッドを実行するとdata connectionを開始します。相手から接続要求はいつでも<code>SKW_PEER_EVENT_CONNECTION</code>イベントを利用して受け取ることができます。 </p>
+    <div class="pre-title">接続開始</div>
+    <pre>SKWDataConnection* dataConnection = [peer connectWithId:'dest-peer-id'];</pre>
+    <div class="pre-title">接続イベントの受信</div>
+    <pre>[peer on:SKW_PEER_EVENT_CONNECTION callback:^(NSObject* dataConnection){ ... }];</pre>
+    <p>SKWPeerの<code>connectWithId</code>メソッドと<code>SKW_PEER_EVENT_CONNECTION</code>イベントのコールバックでは<code>SKWDataConnection</code>オブジェクトを提供します。このオブジェクトを使用してデータの送受信を行うことができます。</p>
+      <pre>[dataConnection on:SKW_DATACONNECTION_EVENT_OPEN callback:^(NSObject* obj){ ... }];
+[dataConnection on:SKW_DATACONNECTION_EVENT_DATA callback:^(NSObject* obj)
+{
+    //文字列データの受信
+    NSString* strData = nil;
+    if ([obj isKindOfClass:[NSString class]])
+    {
+        strData = (NSString *)obj;
+    }
+}];
+// メッセージを送信
+BOOL bResult = [dataConnection send:@"Hello SkyWay!"];
+if (NO == bResult)
+{
+    // 送信失敗
+}
+else
+{
+    // 送信成功
+}
+      </pre>
+    <p>メソッドとイベントの詳細は、<a href="#skwdataconnection">DataConnection API リファレンス</a>をご覧ください。</p>
+    <h3>Video/audio calls</h3>
+    <p>相手のPeerIDを指定してSKWPeerの<code>callWithId</code>メソッドを実行することで、その相手を呼び出すことができます。相手があなたを呼び出した場合、 <code>SKW_PEER_EVENT_CALL</code>イベントが発生します。
+    <p><code>SKW_PEER_EVENT_CALL</code>イベントを受信した時は、必ずそのイベントに応答する必要があります。応答しなければ接続は確立しません。</p>
+    <div class="pre-title">呼び出し開始</div>
+    <pre>SKWMediaConnection* mediaConnection = [peer callWithId:dest-peer-id stream:mediaStream];</pre>
+    <div class="pre-title">呼び出しへの応答</div>
+    <pre>[peer on:SKW_PEER_EVENT_CALL callback:^(NSObject* mediaConnection){
+    [mediaConnection answer:mediaStream];
+}];</pre>
+    <p>相手を呼び出す時、または、呼び出しに応答する時には、SKWMediaStreamを提供する必要があります。
+        SKWMediaStreamにはビデオストリーム（カメラの映像）やオーディオストリームなどがあり、SKWNavigatorの<a href="#skwnavigator-getusermedia"><code>getUserMedia</code></a>メソッドによって取得することができます。
+        尚、呼び出しに応答する時のSKWMediaStreamは必須ではありません。もし応答時にSKWMediaStreamをセットしなければ、一方向の通話が確立されます。
+        通話が確立されると、<code>isOpen</code>プロパティにYESがセットされます。
+    <p>SKWPeerの<code>callWithId</code>と<code>SKW_PEER_EVENT_CALL</code>イベントのコールバックではSKWMediaConnectionオブジェクトを提供します。
+        SKWMediaConnectionオブジェクトは<code>SKW_MEDIACONNECTION_EVENT_STREAM</code> イベントをキャッチすることができます。<code>SKW_MEDIACONNECTION_EVENT_STREAM</code>イベントのコールバックには相手の映像／音声ストリームが含まれます。</p>
+      <pre>[mediaConnection on:SKW_MEDIACONNECTION_EVENT_STREAM callback:^(NSObject* stream)
+{
+    // 'stream' は接続先のSKWMediaStreamです。
+    // ここでSKWVideoに追加
+}];</pre>
+    <p>詳しくは <a href="#skwmediaconnection">MediaConnection API reference</a> をご覧ください。</p>
+
+    <h2>SkyWay RestAPIの使い方</h2>
+    <h3>listAllPeers</h3>
+    <p>APIキー毎のアクティブなPeerIDを取得します。<p>
+      <pre>[peer listAllPeers:^(NSArray* aryPeers)
+{
+    for (NSString* strPeer in aryPeers)
+    {
+        ...
+    }
+}];
+</pre>
+
+
+    <p>SkyWay RestAPIはAPIキー申請時に申請していただいたドメインからのみアクセスが可能です。</p>
+
+    <h2>FAQ</h2>
+
+    <h3>どのような種類のデータを送ることができますか？</h3>
+
+    <p>SkyWay iOS SDKは<a href="#skwconnectoption-serialization">serialization</a>をbinaryまたはbinary-utf8にした場合、<a href="https://github.com/gabriel/MPMessagePack">MessagePack</a>シリアライゼーションフォーマットを利用します。NSData*,NSString*,NSNumber*,NSDictionary*,NSArray*を簡単な手順で送受信することができます。</p>
+          <pre>
+NSDictionary* dctData = @{
+    @"1": @"one",
+    @"2": @"two",
+    @"3": @"three",
+    @"4": @"four",
+    @"5": @"five",
+    };
+BOOL bResult = [_dataConnection send:dctData];</pre>
+    <p>serializationの設定値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。</p>
+
+    <h3>SkyWay iOS SDKを利用することができないシーンはありますか？</h3>
+
+    <p>シンメトリックNATの内側にいるクライアント同士はNATを超えることができないため、通信することができません。
+        ただし、TURNサーバを利用して接続を中継すれば回避することができます。必要であれば、SkyWayが提供するTURNサーバを利用するか別途用意してください。SkyWayが提供するTURNサーバを利用する場合は別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。TURNサーバの情報は、<code>SKWPeer</code>コンストラクタのオプションで設定することができます。</p>
+    <h3>TURNサーバはどのようにして利用するのでしょうか？</h3>
+    <p>SKWPeerオブジェクトを生成する際、SKWPeerOption内のconfigプロパティにおいてSKWIceConfigオブジェクトにURL等の情報を設定してください。</p>
+<pre>
+SKWIceConfig* configStun = [[SKWIceConfig alloc] init];
+configStun.url = @"stun:stun.skyway.io:3478";
+
+SKWIceConfig* configTurn = [[SKWIceConfig alloc] init];
+configTurn.url = @"turn:homeo@turn.bistri.com:80";
+configTurn.credential = @"homeo";
+//設定例はサンプルです。利用時には適切なサーバを設定してください。
+
+SKWPeerOption* options = [[SKWPeerOption alloc] init];
+option.config = @[configStun,configTurn];
+
+SKWPeer* peer = [[SKWPeer alloc] initWithOptions:options];
+</pre>
+    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、オプションの設定は不要です。</p>
+    <h3>接続しようとしてるピアに接続できない場合はどうなりますか？</h3>
+
+    <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。</p>
+
+    <h3>ピアとつながらない場合は何を確認するべきでしょうか？</h3>
+    <p>ピア同士がシンメトリックNATの内側にいる可能性があります。この場合はTURNサーバを利用してください。</p>
+    <p>ファイアウォール等でUDPのポート3478（STUNサーバへの問い合わせに必要）をブロックしているかもしれません。STUNサーバへの問い合わせが可能な状況でご利用ください。</p>
+
+    <h3>遅延／帯域幅は?</h3>
+    <p>ピア同士のデータのやり取りは、TURNを利用する場合を除き、サーバを経由しないため、それが原因となる遅延などは発生しません。ピア同士の処理性能やネットワーク環境に依存します。</p>
+    <p>ピア同士のコネクション確立に関する遅延は、セッション情報の中継（以下、シグナリング）とユーザの識別という2つに分類できます。PeerJSでは、シグナリングの時間を短縮するために、XHRストリーミングリクエストでデータを送った後、WebSocketで送ります。ユーザの識別に関しては手動でIDを指定することで、サーバ側にてIDを生成する際のRTT（Round-Trip delay Time）を短縮することができます。</p>
+
+    <h3>対応OS</h3>
+    <p>iOS 7+</p>
+
+    <h3>動作確認機種</h3>
+    <p>iPhone 5+、iPodTouch 5+、iPad 2+</p>
+
+    <h3>その他</h3>
+    <p><a href="https://groups.google.com/forum/#!forum/skywayjs">SkyWay Technical Forum Google Group(日本語/英語)</a></p>
+    <h3>免責事項</h3>
+    <p>本ドキュメントは<a href="http://peerjs.com/docs/">http://peerjs.com/docs/</a>を元に、NTTコミュニケーションズが提供するSkyWayを利用するための情報等を追記し公開しています。ドキュメント原本に関する個別問い合わせには応じることができませんので、予めご了承ください。</p>
+
+</section>
+
+<header class="left">
+    <h2>API Reference<a class="hide icon">&laquo;</a><a class="show icon">&raquo;</a></h2>
+</header>
+<header class="right">
+    <h2>Getting Started</h2>
+</header>
+
+<section class="api">
+    {{{html_iOS}}}
+</section>
+</div>

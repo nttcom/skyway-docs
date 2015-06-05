@@ -1,0 +1,866 @@
+[
+  {
+    "name": "Peer",
+    "type": "CLASS",
+    "snippet": "Peer peer = new Peer(getApplicationContext(),peerId,options);<br>Peer peer = new Peer(getApplicationContext(),options);",
+    "description": "他のpeerへ接続できるpeerです。また、他のpeerからのコネクションをlistenできます。",
+    "children": [
+      {
+        "name": "peerId",
+        "optional": true,
+        "type": "String",
+        "description": "他のピアがこのピアへ接続するときに使われるIDです。もしIDが指定されない場合、ブローカサーバがIDを生成します。<span class='warn'>このIDを利用してピアを特定するのは推奨しません。なぜならば、このIDはコネクションをブローカ(仲介)するのにのみ使われるように作成されているためです。特定に他の情報を使う場合は、<a href='#connectoption-metadata'><code>metadata</code></a>の利用を推奨します。</span>"
+      },
+      {
+        "name": "options",
+        "optional": false,
+        "type": "<a href='#peeroption'>PeerOption</a>",
+        "description": "設定情報オブジェクトを指定します。"
+      },
+      {
+        "name": "connect",
+        "type": "METHOD",
+        "snippet": "DataConnection dataConnection = peer.connect(peerId);<br>DataConnection dataConnection = peer.connect(peerId,options);",
+        "description": "<code>id</code>で指定されたリモートのPeerへ接続し、DataConnectionを返します。コネクションに失敗した場合は、<a href='#peer-on-event-error'><code>error</code></a>イベントが呼び出されます。",
+        "children": [
+          {
+            "name": "peerId",
+            "type": "String",
+            "description": "リモートpeerのブローカーIDです(リモートpeerの<a href='#peer-identity'><code>identity</code></a>です)。"
+          },
+          {
+            "name": "options",
+            "optional": true,
+            "type": "<a href='#connectoption'>ConnectOption</a>",
+            "description": "設定情報オブジェクトを指定します。"
+          }
+        ]
+      },
+      {
+        "name": "call",
+        "type": "METHOD",
+        "snippet": "MediaConnection mediaConnection = peer.call(peerId,stream);<br>MediaConnection mediaConnection = peer.call(peerId,stream,option);",
+        "description": "<code>id</code>で指定されたリモートのpeerへ発信し、MediaConnectionを返します。コネクションに失敗した場合には、<a href='#peer-on-event-error'><code>error</code></a>イベントが発生します。",
+        "children": [
+          {
+            "name": "peerId",
+            "type": "String",
+            "description": "リモートpeerのブローカーID(リモートpeerの<a href='#peer-identity'><code>identity</code></a>)です。"
+          },
+          {
+            "name": "stream",
+            "type": "<a href='#mediastream'>MediaStream</a>",
+            "description": "使用するローカルメディアストリームです。"
+          },
+          {
+            "name": "option",
+            "optional": true,
+            "type": "<a href='#calloption'>CallOption</a>",
+            "description": "設定情報オブジェクトを指定します。"
+          }
+        ]
+      },
+
+      {
+        "name": "on",
+        "type": "METHOD",
+        "snippet": "peer.on(event,callback);",
+        "description": "PeerのイベントコールバックBlockを設定します。",
+        "children": [
+          {
+            "name": "event",
+            "type": "PeerEventEnum",
+            "description": "設定するイベント種別を指定します。",
+            "children": [
+              {
+                "name": "OPEN",
+                "snippet": "peer.on(Peer.PeerEventEnum.OPEN,new OnCallback(){public void onCallback(Object ownId){...}});",
+                "description": "PeerServerへの接続が確立すると発生します。このイベントが発生する前にpeerを利用することもできますが、サーバへのメッセージはキューイングされます。<code>ownId</code>はブローカーIDです（Peerコンストラクタで指定されるか、サーバによって割付けされます）。<span class='tip'>コネクションの速度が重要である場合、他のピアへ接続する前に、このイベントを待つべきではありません。</span> "
+              },
+              {
+                "name": "CONNECTION",
+                "snippet": "peer.on(Peer.PeerEventEnum.CONNECTION,new OnCallback(){public void onCallback(Object object){...}});",
+                "description": "リモートピアと新しいdata connectionが確立すると発生します。callbackの引数はDataConnectionクラスになります。"
+              },
+              {
+                "name": "CALL",
+                "snippet": "peer.on(Peer.PeerEventEnum.CALL,new OnCallback(){public void onCallback(Object object){...}});",
+                "description": "リモートのpeerがあなたに発信してきたときに発生します。callbackの引数はMediaConnectionクラスになります。<code>mediaConnection</code>はこの時点でアクティブではありません。最初に応答を返す必要があります（<a href='#mediaconnection-answer'><code>mediaConnection.answer(stream);</code></a>）。返答後、streamイベントをlistenできます。"
+              },
+              {
+                "name": "CLOSE",
+                "snippet": "peer.on(Peer.PeerEventEnum.CLOSE,new OnCallback(){public void onCallback(Object object){...}});",
+                "description": "ピアとの接続が<a href='#peer-isdestroyed'>destroyed</a>となった場合に発生します。<span class='tip'>peerを確実にクリアするためには、peerが不要となった時点で、peer.destroy()の実行を推奨します。</span>"
+              },
+              {
+                "name": "DISCONNECTED",
+                "snippet": "peer.on(Peer.PeerEventEnum.DISCONNECTED,new OnCallback(){public void onCallback(Object object){...}});",
+                "description": "ピアとの接続が<a href='#peer-isdisconnected'>disconnected</a>となった場合に発生します。"
+              },
+              {
+                "name": "ERROR",
+                "snippet": "peer.on(Peer.PeerEventEnum.ERROR,new OnCallback(){public void onCallback(Object object){...}});",
+                "description": "callbackの引数は<a href='#peererror'>PeerError</a>クラスになります。peerに対するエラーは、ほとんど常に致命的であり、peerを破壊します。ソケットから生じるエラーや、PeerConnectionsから生じるエラーは、このイベントに伝えられます。"
+              }
+            ]
+          },
+          {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+          }
+        ]
+      },
+
+      {
+        "name": "disconnect",
+        "type": "METHOD",
+        "snippet": "peer.disconnect();",
+        "description": "サーバとの接続をクローズします。既存のデータおよびメディア接続はそのままです。<a href='#peer-isdisconnected'><code>disconnected</code></a>に<code>true</code>が設定されます。<span class='warn'>この操作は必ず実施してください。それぞれのPeerオブジェクトが利用不可能、またはコネクションを受信できません。idも（クラウド上の）サーバに没収されます。</span>"
+      },
+      {
+        "name": "destroy",
+        "type": "METHOD",
+        "snippet": "peer.destroy();",
+        "description": "サーバへの接続をクローズし、すべての既存のコネクションを終了します。<a href='#peer-isdestroyed'><code>destroyed</code></a>は<code>true</code>に設定されます。<span class='warn'>この操作は必ず実施してください。それぞれのPeerオブジェクトが利用不可能、またはコネクションを受信できません。idも（クラウド上の）サーバに没収されます。さらに、データコネクション・メディアコネクションもクローズされます。</span>"
+      },
+
+      {
+        "name": "listAllPeers",
+        "type": "METHOD",
+        "snippet": "peer.listAllPeers(new OnCallback(){public void onCallback(Object object){...}});",
+        "description": "SkyWayが提供するRestAPIにアクセスし、APIキー毎のアクティブなPeerIDを取得します。PeerIDはJSONArrayで渡されます。"
+      },
+
+      {
+        "name": "identity",
+        "type": "String",
+        "description": "peerのブローカーIDです。もしIDが<a href='#peer'>Peerクラス</a>で指定されない場合、<a href='#peer-on-event-open'><code>open</code></a>が発生するまで、<code>undefined</code>のままです。"
+      },
+
+      {
+        "name": "connections",
+        "type": "Map",
+        "description": "コネクション接続管理オブジェクトです。リモートpeerのIDがkeyとして、peerと関連付けされるコネクションを持つハッシュです。<span class='tip'>このハッシュに頼るよりも、自身でコネクションを追跡管理することを推奨します。</span>"
+      },
+
+      {
+        "name": "isDisconnected",
+        "type": "Boolean",
+        "description": "PeerServerとのアクティブなコネクションがある場合は、<code>false</code> です。"
+      },
+
+      {
+        "name": "isDestroyed",
+        "type": "Boolean",
+        "description": "このpeerにおける、全接続が利用されていない場合は<code>true</code>です。"
+      }
+    ]
+  },
+
+  {
+    "name": "PeerOption",
+    "type": "CLASS",
+    "snippet": "PeerOption options = new PeerOption();",
+    "description": "Peer初期化時のオプション設定情報クラスです。",
+    "children": [
+      {
+        "name": "key",
+        "type": "String",
+        "description": "クラウド上のPeerServerを利用するためのAPIキーです。"
+      },
+      {
+        "name": "domain",
+        "type": "String",
+        "description": "SkyWayでの開発者登録時に指定したWebサーバのドメイン文字列を指定します。"
+      },
+      {
+        "name": "host",
+        "optional": true,
+        "type": "String",
+        "description": "サーバのホスト名です。デフォルトは<code>skyway.io</code>となります。"
+
+      },
+      {
+        "name": "port",
+        "optional": true,
+        "type": "int",
+        "description": "サーバのポート番号です。デフォルトは<code>443</code>番となります。"
+
+      },
+      {
+        "name": "path",
+        "optional": true,
+        "type": "String",
+        "description": "自身のPeerServerが動作している場所のpathです。デフォルトは、<code>'/'</code>です。"
+      },
+      {
+        "name": "secure",
+        "optional": true,
+        "type": "Boolean",
+        "description": "SSLを利用する場合は、<code>true</code>にします。skyway.ioはSSLを利用するため、デフォルトは、<code>true</code>です。"
+      },
+      {
+        "name": "turn",
+        "optional": true,
+        "type": "Boolean",
+        "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>true</code>にします。デフォルトは、<code>false</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
+      },
+      {
+        "name": "config",
+        "optional": true,
+        "type": "ArrayList <IceConfig>",
+        "description": "STUN/TURNサーバ設定オブジェクト<a href='#iceconfig'><code>IceConfig</code></a>のArrayを設定します。デフォルトでは、SkyWayのSTUNサーバ(stun:stun.skyway.io:3478)が設定されています。尚、SkyWayが提供するTURNサーバを利用する場合は、TURNサーバについての記載は不要です。"
+      },
+      {
+        "name": "debug",
+        "optional": true,
+        "type": "DebugLevelEnum",
+        "description": "debugレベルにしたがってログを出力します。デフォルト値は<code>DEBUG_LEVEL_NO_LOGS</code>です。",
+        "children": [
+          {
+            "name": "NO_LOGS",
+            "description": "ログを出力しません。"
+          },
+          {
+            "name": "ONLY_ERROR",
+            "description": "エラーのみログ出力します。"
+          },
+          {
+            "name": "ERROR_AND_WARNING",
+            "description": "エラーと警告をログ出力します。"
+          },
+          {
+            "name": "ALL_LOGS",
+            "description": "すべてのログを出力します。"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "IceConfig",
+    "snippet": "IceConfig config = new IceConfig();",
+    "type": "CLASS",
+    "description": "Peer初期化時のSTUN/TURNサーバ設定情報クラスです。",
+    "children":[
+      {
+        "name": "url",
+        "type": "String",
+        "description": "STUN/TURN サーバの URL を指定します。"
+      },
+      {
+        "name": "username",
+        "optional": true,
+        "type": "String",
+        "description": "ユーザー名が必要な場合に設定します。"
+      },
+      {
+        "name": "credential",
+        "optional": true,
+        "type": "String",
+        "description": "パスワードが必要な場合に設定します。"
+      }
+    ]
+  },
+
+  {
+    "name": "ConnectOption",
+    "type": "CLASS",
+    "snippet": "ConnectOption option = new ConnectOption();",
+    "description": "Peerのconnect実行時のオプション設定情報クラスです。",
+    "children": [
+      {
+        "name": "label",
+        "type": "String",
+        "description": "data connectionを識別するためのユニークなラベルです。もし特定されていない場合は、ランダムに生成されます。dataConnection.<a href='#dataconnection-label'><code>label</code></a>を通じてアクセスできます。"
+      },
+      {
+        "name": "metadata",
+        "type": "String",
+        "description": "コネクションに関連付けされるメタデータで、コネクションを開始したpeerに渡されます。dataConnection.<a href='#dataconnection-metadata'><code>metadata</code></a>を通じてアクセスできます。serialize可能です。"
+      },
+      {
+        "name": "serialization",
+        "type": "DataConnection.SerializationEnum",
+        "description": "データ通信形式を指定します。デフォルトでBINARYが設定されます。この値によってdataConnection.<a href='#dataconnection-send'><code>send</code></a>で送れるデータ型が変化します。dataConnection.<a href='#dataconnection-serialization'><code>serialization</code></a>にて確認できます。",
+        "children": [
+          {
+            "name": "BINARY",
+            "description": "データ通信形式を<code>binary</code>にします。"
+          },
+          {
+            "name": "BINARY_UTF8",
+            "description": "データ通信形式を<code>binary-utf8</code>にします。"
+          },
+          {
+            "name": "JSON",
+            "description": "データ通信形式を<code>json</code>にします。"
+          },
+          {
+            "name": "NONE",
+            "description": "データ通信形式を<code>none</code>にします。"
+          }
+        ]
+      },
+      {
+        "name": "reliable",
+        "type": "Boolean",
+        "description": "data channelに信頼性をもたせるか(例えば、大きなファイルの転送）、もたせないか（例えば、ゲームやストリーミング）を指定可能です。デフォルトはfalseです。"
+      }
+    ]
+  },
+
+
+  {
+    "name": "CallOption",
+    "type": "CLASS",
+    "snippet": "CallOption option = new CallOption();",
+    "description": "Peerのcall実行時のオプション設定情報クラスです。",
+    "children": [
+      {
+        "name": "metadata",
+        "type": "String",
+        "description": "コネクションと関連付けされるメタデータ文字列です。"
+      }
+    ]
+  },
+
+  {
+    "name": "PeerError",
+    "type": "CLASS",
+    "description": "”error”イベント時に取得できるクラスです。OS からのエラー情報が存在した場合、エラー情報オブジェクトがプロパティerrorに参照されます。",
+    "children": [
+      {
+        "name": "type",
+        "type": "PeerErrorEnum",
+        "description": "列挙型のエラータイプが設定されます。",
+        "children": [
+          {
+            "name": "NO_ERROR",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "エラーがない状態です"
+          },
+          {
+            "name": "BROWSER_INCOMPATIBLE",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "利用しようとしているwebRTC機能のすべて、またはいくつかについて、サポートしていません。"
+          },
+          {
+            "name": "INVALID_ID",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "Peerクラスへ渡されたIDに、不正な文字が含まれています。"
+          },
+          {
+            "name": "INVALID_KEY",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "Peerクラスへ渡されたAPI Keyが不正な文字列を含んでいます。または、API Keyが含まれていません（クラウド上のサーバを利用する場合のみ）。"
+          },
+          {
+            "name": "UNAVAILABLE_ID",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "Peerクラスへ渡されたIDは既に利用されています。"
+          },
+          {
+            "name": "SSL_UNAVAILABLE",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "SSL関連のエラーです。"
+          },
+          {
+            "name": "DISCONNECTED",
+            "type": "Error",
+            "description": "既にこのPeerとの接続が切断されており、新しいコネクションを作成できません。"
+          },
+          {
+            "name": "SERVER_ERROR",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "サーバに到達できません。"
+          },
+          {
+            "name": "SOCKET_ERROR",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "ソケットからのエラーです。"
+          },
+          {
+            "name": "SOCKET_CLOSED",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "ソケットが予期せずクローズしました。"
+          },
+          {
+            "name": "NETWORK",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "シグナリングサーバとのネットワークエラーです。"
+          },
+          {
+            "name": "PEER_UNAVAILABLE",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "接続できないPeerに接続しようとしています。"
+          },
+          {
+            "name": "WEBRTC",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "WebRTC関連での何からのエラーです。"
+          }
+        ]
+      },
+      {
+        "name": "message",
+        "type": "String",
+        "description": "エラーメッセージです。"
+      },
+      {
+        "name": "exception",
+        "type": "Exception",
+        "description": "OSからのエラー情報オブジェクトです。"
+      }
+    ]
+  },
+  {
+    "name": "DataConnection",
+    "type": "CLASS",
+    "description": "WebRTCのData Channelをラップします。このオブジェクトを得るためには、Peerの<a href='#peer-connect'><code>connect</code></a>を使うか、<a href='#peer-on-event-connection'><code>CONNECTION</code></a>発生時に渡されるオブジェクトを使用してください。",
+    "children": [
+      {
+        "name": "send",
+        "type": "METHOD",
+        "snippet": "BOOL bResult = dataConnection.send(data);",
+        "description": "接続中のリモートピアにデータを送信します。プロパティ<a href='#dataconnection-serialization'><code>serialization</code></a>の値によって送信処理が変わります。serializationの値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。",
+        "children": {
+          "name": "data",
+          "description": "送信するデータです。"
+          }
+      },
+      {
+        "name": "close",
+        "type": "METHOD",
+        "snippet": "dataConnection.close();",
+        "description": "DataChannelとPeerConnectionを解放して、コネクションをクローズします。"
+      },
+      {
+        "name": "on",
+        "type": "METHOD",
+        "snippet": "dataConnection.on(event,new OnCallback(){public void onCallback(Object object){}});",
+        "description": "DataConnectionのイベントコールバックBlockを設定します。",
+        "children": [
+          {
+            "name": "event",
+            "type": "DataEventEnum",
+            "description": "設定するイベント種別を指定します。",
+            "children": [
+              {
+                "name": "DATA",
+                "description": "リモートpeerからデータを受信した場合に発生します。"
+              },
+              {
+                "name": "OPEN",
+                "description": "コネクションが利用可能となった場合に発生します。"
+              },
+              {
+                "name": "CLOSE",
+                "description": "あなたが、またはリモートのpeerがdata connectionをクローズした場合に発生します。"
+              },
+              {
+                "name": "ERROR",
+                "description": "callbackの引数は<a href='#peererror'>PeerError</a>クラスになります。"
+              }
+            ]
+            },
+            {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+            }
+          ]
+        },
+        {
+        "name": "bufferSize",
+        "type": "int",
+        "description": "バッファが一杯になった場合に、キューされるメッセージのサイズです。"
+        },
+        {
+        "name": "dataChannel",
+        "type": "<a href='#datachannel'>DataChannel</a>",
+        "description": "コネクションに関連付けされたDataChannelオブジェクトへの参照です。"
+        },
+        {
+          "name": "label",
+          "type": "String",
+          "description": "コネクションが開始されたときにアサインされる、または指定されるオプションのラベルです。"
+        },
+        {
+          "name": "metadata",
+          "type": "String",
+          "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータ文字列です。"
+        },
+        {
+          "name": "isOpen",
+          "type": "BOOL",
+          "description": "コネクションがopenであり、読み込み/書き込みの準備ができている場合に<code>true</code>になります。"
+        },
+        {
+          "name": "peerConnection",
+          "type": "PeerConnection",
+          "description": "コネクションに関連付けされる、PeerConnectionオブジェクトです。"
+        },
+        {
+          "name": "peer",
+          "type": "String",
+          "description": "コネクションの相手側のpeer IDです。"
+        },
+        {
+          "name": "reliable",
+          "type": "BOOL",
+          "description": "信頼性のあるdata channelの場合は<code>true</code>です。コネクションの開始時に定義されます。"
+        },
+        {
+          "name": "serialization",
+          "type": "SerializationEnum",
+          "description": "コネクションを通じて送信されるデータのserializeフォーマットです。コネクションの開始時に定義されます",
+          "children": [
+            {
+              "name": "BINARY",
+              "description": "データ通信形式が<code>binary</code>の時にこの値が返されます。"
+            },
+            {
+              "name": "BINARY_UTF8",
+              "description": "データ通信形式が<code>binary-utf8</code>の時にこの値が返されます。"
+            },
+            {
+              "name": "JSON",
+              "description": "データ通信形式が<code>json</code>の時にこの値が返されます。"
+            },
+            {
+              "name": "NONE",
+              "description": "データ通信形式が<code>none</code>の時にこの値が返されます。"
+            }
+          ]
+        },
+        {
+        "name": "type",
+        "type": "String",
+        "description": "data connectionでは、常に<code>'data'</code>が設定されます。"
+        }
+      ]
+    },
+  {
+    "name": "MediaConnection",
+    "type": "CLASS",
+    "description": "WebRTCのmedia streamをラップします。このオブジェクトを得るためには、Peerの<a href='#peer-call'><code>call</code></a>を使うか、<a href='#peer-on-event-call'><code>CALL</code></a>発生時に渡されるオブジェクトを使用してください。",
+    "children": [
+      {
+        "name": "answer",
+        "type": "METHOD",
+        "snippet": "mediaConnection.answer();<br>mediaConnection.answer(stream);",
+        "description": "<a href='#peer-on-event-call'><code>call</code></a>イベントを受信した場合に、応答するためにコールバックにて与えられるmedia connectionにて<code>answer</code>を呼び出せます。また、オプションで自身のmedia streamを設定できます。",
+        "children": {
+          "name": "stream",
+          "optional": true,
+          "type": "<a href='#mediastream'>MediaStream</a>",
+          "description": "NavigatorのgetUserMediaによって取得される<a href='#mediastream'><code>MediaStream</code></a>です。"
+        }
+      },
+      {
+        "name": "close",
+        "type": "METHOD",
+        "snippet": "media.close();",
+        "description": "media connectionをクローズします。"
+      },
+      {
+        "name": "on",
+        "type": "METHOD",
+        "snippet": "media.on(event, new OnCallback(){puclic void onCallback(Object object){}});",
+        "description": "MediaConnectionのイベントコールバックBlockを設定します。",
+        "children": [
+          {
+            "name": "event",
+            "type": "MediaEventEnum",
+            "description": "設定するイベント種別を指定します。",
+            "children": [
+              {
+                "name": "STREAM",
+                "description": "リモートのpeerが<code>stream</code>を追加したときに発生します。"
+              },
+              {
+                "name": "CLOSE",
+                "description": "あなたか、リモートのpeerがmedia connectionをクローズした時に発生します。"
+              },
+              {
+                "name": "ERROR",
+                "description": "callbackの引数は<a href='#peererror'>PeerError</a>クラスになります。"
+              }
+            ]
+          },
+          {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+          }
+        ]
+      },
+      {
+        "name": "isOpen",
+        "type": "BOOL",
+        "description": "コネクションがopenであり、読み込み/書き込みの準備ができている場合に<code>true</code>になります。"
+      },
+      {
+        "name": "peer",
+        "type": "String",
+        "description": "コネクションの相手側のpeer IDです。"
+      },
+      {
+        "name": "type",
+        "type": "String",
+        "description": "media connectionでは、常に<code>'media'</code>が設定されます。"
+      }
+    ]
+  },
+  {
+    "name": "MediaStream",
+    "type": "CLASS",
+    "children": [
+      {
+        "name": "close",
+        "type": "METHOD",
+        "snippet": "stream.close();",
+        "description": "メディアストリームをすべて閉じます。"
+      },
+      {
+        "name": "getVideoTracks",
+        "type": "METHOD",
+        "snippet": "int videos = stream.getVideoTracks();",
+        "description": "メディアストリームに追加されているビデオトラック数を取得します。"
+      },
+      {
+        "name": "setEnableVideoTrack",
+        "type": "METHOD",
+        "snippet": "stream.setEnableVideoTrack(pos,enable);",
+        "description": "メディアストリームに追加済みのビデオトラック再生状態を設定します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "int",
+            "description": "ビデオトラック番号を選択します。ビデオトラック番号は０以上を設定します。"
+          },
+          {
+            "name": "enable",
+            "type": "Boolean",
+            "description": "<code>true</code>なら再生し、<code>false</code>なら停止します"
+          }
+        ]
+      },
+      {
+        "name": "getEnableVideoTrack",
+        "type": "METHOD",
+        "snippet": "Boolean enable = stream.getEnableVideoTrack(pos);",
+        "description": "メディアストリームに追加済みのビデオトラック再生状態を取得します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "int",
+            "description": "ビデオトラック番号 (0 -)を選択します。"
+          }
+        ]
+      },
+      {
+        "name": "getAudioTracks",
+        "type": "METHOD",
+        "snippet": "int audios = stream.getAudioTracks();",
+        "description": "メディアストリームに追加されているオーディオトラック数を取得します。"
+      },
+      {
+        "name": "setEnableAudioTrack",
+        "type": "METHOD",
+        "snippet": "stream.setEnableAudioTrack(pos,enable);",
+        "description": "メディアストリームに追加済みのオーディオトラック再生状態を設定します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "int",
+            "description": "オーディオトラック番号 (0 -)を選択します。"
+          },
+          {
+            "name": "enable",
+            "type": "Boolean",
+            "description": "<code>true</code>なら再生し、<code>false</code>なら停止します"
+          }
+        ]
+      },
+      {
+        "name": "getEnableAudioTrack",
+        "type": "METHOD",
+        "snippet": "Boolean enable = stream.getEnableAudioTrack(pos);",
+        "description": "メディアストリームに追加済みのオーディオトラック再生状態を取得します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "int",
+            "description": "オーディオトラック番号を選択します。オーディオトラック番号は０以上が設定されます。"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Canvas",
+    "type": "OBJECT",
+    "snippet": "Canvas canvas = (Canvas) findViewById(R.id.ownvideo);",
+    "description": "映像を表示するレンダラービュー オブジェクトです。",
+    "children": [
+      {
+        "name": "addSrc",
+        "type": "METHOD",
+        "snippet": "canvas.addSrc(stream,trackNo);",
+        "description": "メディアソースとして、 指定のメディアストリーム・トラック番号を追加します。",
+        "children": [
+          {
+            "name": "stream",
+            "type": "<a href='#mediastream'>MediaStream</a>",
+            "description": "追加するメディアストリームです。"
+          },
+          {
+            "name": "trackNo",
+            "type": "int",
+            "description": "追加するビデオトラック番号です。トラック番号は０以上の数で設定します。"
+          }
+        ]
+      },
+      {
+        "name": "removeSrc",
+        "type": "METHOD",
+        "snippet": "canvas.removeSrc(stream,trackNo);",
+        "description": "メディアソースとして使用していたメディアストリーム・トラック番号を削除します。",
+        "children": [
+          {
+            "name": "stream",
+            "type": "<a href='#mediastream'>MediaStream</a>",
+            "description": "削除するメディアストリームです。"
+          },
+          {
+            "name": "trackNo",
+            "type": "int",
+            "description": "削除するビデオトラック番号です。"
+          }
+        ]
+      }
+    ]
+  },
+
+
+  {
+    "name": "Navigator",
+    "type": "CLASS",
+    "description": "映像を取得するためのクラスです。",
+    "children": [
+      {
+        "name": "initialize",
+        "type": "METHOD",
+        "snippet": "Navigator.initialize(peer);",
+        "description": "初期化を行います。",
+        "children": [
+          {
+            "name": "peer",
+            "type": "<a href='#peer'>Peer</a>",
+            "description": "作成・初期化済みのPeerオブジェクト"
+          }
+        ]
+      },
+      {
+        "name": "terminate",
+        "type": "METHOD",
+        "snippet": "Navigator.terminate();",
+        "description": "終了化を行います。"
+      },
+      {
+        "name": "getUserMedia",
+        "type": "METHOD",
+        "snippet": "MediaStream stream = Navigator.getUserMedia(constraints);",
+        "description": "ローカルメディアストリームを取得します。",
+        "children": [
+          {
+            "name": "constraints",
+            "type": "<a href='#mediaconstraints'>MediaConstraints</a>",
+            "description": "メディアストリームの設定です。"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "MediaConstraints",
+    "type": "CLASS",
+    "description": "<a href='#navigator'>Navigator</a>のgetUserMedia実行時のオプション設定クラスです。",
+    "children": [
+      {
+        "name": "videoFlag",
+        "type": "Boolean",
+        "description": "映像使用を設定します。<code>true</code>なら映像を有効に、<code>false</code>なら映像を無効にします。デフォルトは<code>true</code>です。"
+      },
+      {
+        "name": "audioFlag",
+        "type": "Boolean",
+        "description": "音声使用を設定します。<code>true</code>なら音声を有効に、<code>false</code>なら音声を無効にします。デフォルトは<code>true</code>です。"
+      },
+      {
+        "name": "cameraPosition",
+        "type": "CameraPositionEnum",
+        "description": "使用するカメラの位置を設定します。デフォルトはFRONTになります。",
+        "children": [
+          {
+            "name": "UNSPECIFIED",
+            "description": "一番始めに見つけたカメラを使用します。順序はシステムに依存します。"
+          },
+          {
+            "name": "BACK",
+            "description": "アウトカメラを使用します。アウトカメラが見つからない場合は、一番始めに見つけたカメラを使用します。"
+          },
+          {
+            "name": "FRONT",
+            "description": "インカメラを使用します。インカメラが見つからない場合は、一番始めに見つけたカメラを使用します。"
+          }
+        ]
+      },
+      {
+        "name": "maxWidth",
+        "type": "int",
+        "description": "横ピクセル上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>640</code>となります。"
+      },
+      {
+        "name": "minWidth",
+        "type": "int",
+        "description": "横ピクセル下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+      },
+      {
+        "name": "maxHeight",
+        "type": "int",
+        "description": "縦ピクセル上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>640</code>となります。"
+      },
+      {
+        "name": "minHeight",
+        "type": "int",
+        "description": "縦ピクセル下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+      },
+      {
+        "name": "maxFrameRate",
+        "type": "int",
+        "description": "フレームレート上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>10</code>となります。"
+      },
+      {
+        "name": "minFrameRate",
+        "type": "int",
+        "description": "フレームレート下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+      }
+    ]
+  }
+]
