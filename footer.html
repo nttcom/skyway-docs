@@ -1,0 +1,28 @@
+</div>
+<script type="text/javascript">
+
+$(window).load(function(){
+  $('#tab-content > div').hide(); 
+  $('#tab a').click(function () {
+    $('#tab-content > div').hide().filter(this.hash).show(); //アンカー要素を表示
+    
+    $('#tab a').removeClass('active');
+    $(this).addClass('active');
+    
+    return false; //いれてないとアンカーリンクになる
+  }).filter(':eq(0)').click();
+  var hash = window.location.hash;
+  if(hash.match("#iOS-")){
+  	$('#tab a[href="#iOS"]').trigger("click");
+  	$('a[href="' + hash + '"]').trigger("click");
+  }else if(hash.match("#Android-")){
+	$('#tab a[href="#Android"]').trigger("click");
+	$('a[href="' + hash + '"]').trigger("click");
+  }else{
+  	$('#tab a[href="' + hash + '"]').trigger("click");
+  }
+})
+
+</script>
+</body>
+</html>

@@ -2,6 +2,50 @@ html{color:#000;background:#FFF;}body,div,dl,dt,dd,ul,ol,li,pre,code,form,fields
 a {outline: none;} /* Gets rid of Firefox's dotted borders */
 a img {border: none;} /* Gets rid of IE's blue borders */
 
+#tab-controll{
+  padding-top: 5px;
+  width:100%;
+  height:35px;
+  background-color: #eee;
+  border-bottom: 3px solid #50484e;
+}
+#tab {
+  margin-left: 0;
+  padding-left: 0;
+  margin-bottom: 1em;
+  height: 35px;
+  overflow: hidden;
+}
+#tab li {
+  float: left;
+  width: 150px;
+  height: 35px;
+}
+#tab a {
+  display: table-cell;
+  width: 150px;
+  height: 35px;
+  /*border: 1px solid #ccc;*/
+  border-bottom: 0;
+  font-size: 20;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px; 
+  
+  color: #777;
+  text-align: center;
+  vertical-align: middle;
+}
+#tab a:hover{
+  /*border-color: #333;*/
+  color: #fff;
+  background-color: #635960;
+}
+#tab a.active {
+  /*border-color: #333;*/
+  color: #fff;
+  background-color: #50484e;
+}
+
 
 body, html {
   font-size: 14px;
@@ -14,7 +58,6 @@ header.right, header.left {
   cursor: pointer;
   z-index: 100;
   position: fixed;
-  top: 0;
   height: 35px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -68,7 +111,7 @@ header.right {
 
 .api, .start {
   position: absolute;
-  top: 0px;
+  top: 43px;
   bottom: 0px;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -101,7 +144,7 @@ header.right {
   background-color: #fcfcfc;
   width: 53%;
   right: 0px;
-  top: 35px;
+  top: 78px;
   text-shadow: 0px -1px 0 #fff;
   border-top: 1px solid #fff;
   z-index: 99;
@@ -198,7 +241,7 @@ a:hover {
 .api {
   color: #f5eff3;
   font-weight: 300;
-  top: 35px;
+  top: 78px;
   left: 0px;
   width: 47%;
   border-right: 4px solid #474046;
@@ -216,7 +259,7 @@ a:hover {
   font-weight: 800;
   display: inline-block;
   margin: 0 2px;
-  color: rgba(255,255,255,0.2);
+  color: rgb(150,150,150);
 }
 
 .toplevel {
@@ -261,7 +304,7 @@ a:hover {
   letter-spacing: 1px;
   font-weight: 600;
   font-family: "Lato", Helvetica, sans-serif;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   border: 1px solid rgba(0,0,0,0.4);
   text-shadow: 0px -1px 0px rgba(0,0,0,0.2);
 }
@@ -394,6 +437,14 @@ a:hover {
   -moz-box-sizing: border-box;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+.pre-title{
+    font-weight: 600;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .clear {

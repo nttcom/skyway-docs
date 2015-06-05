@@ -1,0 +1,189 @@
+<div id="Android">
+<section class="start">
+    <h1><a href="/skyway/">SkyWay Android SDK</a> <span class="title">docs</span></h1>
+    <p><br>SkyWayは、WebRTCを利用したピア·ツー·ピアのデータ、ビデオ、オーディオ通信を簡単に実現することができます。「SkyWay Android SDK」はSkyWayをAndroidから利用できるフレームワークです。このドキュメントでは、SkyWay Android SDKの基本的な使い方を紹介します。SkyWay Android SDKを用いた実装例をご覧になりたい方は, <a href="https://github.com/nttcom/SkyWay-Android-Sample">サンプルアプリ</a> を御覧ください。</P>
+    <h2>セットアップ</h2>
+    <h3>1. 必要な設定を追加</h3>
+    <p>下記の設定をマニフェストファイルに追加してください。</p>
+    <pre>&lt;uses-feature android:name="android.hardware.camera" /&gt;
+&lt;uses-feature android:name="android.hardware.camera.autofocus" /&gt;
+&lt;uses-feature android:glEsVersion="0x00020000" android:required="true" /&gt;
+
+&lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /&gt;
+&lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+&lt;uses-permission android:name="android.permission.CAMERA" /&gt;
+&lt;uses-permission android:name="android.permission.RECORD_AUDIO" /&gt;
+&lt;uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" /&gt;
+</pre>
+    <h3>2. SkyWay Android SDKのインポート</h3>
+    <p>SkyWay.aarをアプリケーションに追加後にSkyWay Android SDKのクラスファイルをインポートしてください。</p>
+    <pre>#import &lt;io.skyway.Peer.*&gt;</pre>
+    <h3>3. Peerオブジェクトを作成</h3>
+    <p>Peerオブジェクトは、Peerコネクションを生成、受信する為に利用します。</p>
+    <pre>PeerOption options = new PeerOption();
+options.key = "{APIKEY}";
+options.domain = "{DOMAIN}";
+Peer peer = new Peer(options);</pre>
+    <p>Peerのコンストラクタに渡す'APIKEY'は、SkyWayのAPIキーです。<a
+            href="http://nttcom.github.io/skyway/registration.html">APIキーの申し込み</a>を行うことで無料で取得することができます。APIキー申込時には利用ドメインを申請していただきます。APIキーは申請したドメインからのみ利用可能です。</p>
+
+    <p>セッション情報交換やシグナリングに利用するサーバを、自身で構築することもできます。
+        詳しくは<a href="http://github.com/peers/peerjs-server">peerjs-server</a>をご覧ください。</p>
+    <p>これで利用するための準備はすべて整いました！</p>
+
+    <h2>使い方</h2>
+    <p>Peerオブジェクトは生成時、ランダムなID（以下、PeerID）が付与されます。</p>
+      <pre>peer.on(Peer.PeerEventEnum.OPEN, new OnCallback(){
+  　public void onCallback(Object object){
+    　if (object instanceof String){
+      　string id = (String) object;
+    　}
+  　}
+　});</pre>
+    <p>他のPeerと接続したい場合は、接続先のPeerIDが必要になります。
+        Peerクラスの<a href="#peer-listallpeers">listAllPeers</a>メソッドを用いて接続先のPeerIDを入手するか、何らかの仕組みでPeerIDを交換してください。<a href="#peer">Peerコンストラクタ</a>のオプションに任意のPeerIDを指定する事もできます</p>
+
+    <p>その他の<a href="#peeroption">オプション</a>、メソッド、<a href="#peer-on">イベント</a>、<a href="#peer-on-event-error">エラー処理</a>などの詳細は、<a href="#peer">Peer API リファレンス</a>をお読みください。</p>
+
+    <h3>Data connections</h3>
+    <p>相手のPeerIDを指定してPeerの<code>connect(peerId)</code>メソッドを実行するとdata connectionを開始します。相手から接続要求はいつでも<code>PeerEventEnum.CONNECTION</code>イベントを利用して受け取ることができます。 </p>
+    <div class="pre-title">接続開始</div>
+    <pre>DataConnection dataConnection = peer.connect('dest-peer-id');</pre>
+    <div class="pre-title">接続イベントの受信</div>
+    <pre>peer.on(Peer.PeerEventEnum.CONNECTION,new OnCallback(){
+ public void onCallback(Object object){
+   //接続イベント受信時の処理
+   }
+ });</pre>
+    <p>Peerの<code>connect(peerId)</code>メソッドと<code>PeerEventEnum.CONNECTION</code>イベントのコールバックでは<code>DataConnection</code>オブジェクトを提供します。このオブジェクトを使用してデータの送受信を行うことができます。</p>
+      <pre>dataConnection.on(DataEventEnum.DATA,new OnCallback(){
+  public void onCallback(Object object){
+    //文字列データの受信
+    String strValue = null;
+    if (object instanceof String){
+      strValue = (String)object;
+    }
+  }
+});
+
+//メッセージ送信
+Bool bResult = dataConnection.send("Hello SkyWay!");
+if(NO == bResult){
+  //送信失敗
+}else{
+  //送信成功
+}
+
+</pre>
+    <p>メソッドとイベントの詳細は、<a href="#dataconnection">DataConnection API リファレンス</a>をご覧ください。</p>
+    <h3>Video/audio calls</h3>
+    <p>相手のPeerIDを指定してPeerの<code>call(peerId)</code>メソッドを実行することで、その相手を呼び出すことができます。相手があなたを呼び出した場合、 <code>PeerEventEnum.CALL</code>イベントが発生します。
+    <p><code>PeerEventEnum.CALL</code>イベントを受信した時は、必ずそのイベントに応答する必要があります。応答しなければ接続は確立しません。</p>
+    <div class="pre-title">呼び出し開始</div>
+    <pre>MediaConnection mediaConnection = peer.call('dest-peer-id',mediaStream);</pre>
+    <div class="pre-title">呼び出しへの応答</div>
+    <pre>peer.on(Peer.PeerEventEnum.CALL,new OnCallback(){
+  public void onCallback(Object object){
+    mesiaConnection.answer(mesiastream);
+  }
+});</pre>
+    <p>相手を呼び出す時、または、呼び出しに応答する時には、MediaStreamを提供する必要があります。
+        MediaStreamにはビデオストリーム（カメラの映像）やオーディオストリームなどがあり、Navigatorの<a href="#navigator-getusermedia"><code>getUserMedia</code></a>メソッドによって取得することができます。
+        尚、呼び出しに応答する時のMediaStreamは必須ではありません。もし応答時にMediaStreamをセットしなければ、一方向の通話が確立されます。
+        通話が確立されると、<code>isOpen</code>プロパティにtrueがセットされます。
+    <p>Peerの<code>call(peerId)</code>と<code>PeerEventEnum.CALL</code>イベントのコールバックではMediaConnectionオブジェクトを提供します。
+        MediaConnectionオブジェクトは<code>MediaEventEnum.STREAM</code> イベントをキャッチすることができます。<code>MediaEventEnum.STREAM</code>イベントのコールバックには相手の映像／音声ストリームが含まれます。</p>
+      <pre>mediaConnection.on(event, new OnCallback(){
+        puclic void onCallback(Object object){
+          // 'stream'　は接続先のMediaStreamです。
+          // ここでCanvasに追加
+        }
+      });</pre>
+    <p>詳しくは <a href="#mediaconnection">MediaConnection API reference</a> をご覧ください。</p>
+
+    <h2>SkyWay RestAPIの使い方</h2>
+    <h3>listAllPeers</h3>
+    <p>APIキー毎のアクティブなPeerIDを取得します。<p>
+      <pre>peer.listAllPeers(new OnCallback(){
+  public void onCallback(Object object){
+    if (!(object instanceof JSONArray)){
+      return;
+    }
+    JSONArray peers = (JSONArray) object;
+  }
+});
+</pre>
+
+
+    <p>SkyWay RestAPIはAPIキー申請時に申請していただいたドメインからのみアクセスが可能です。</p>
+
+    <h2>FAQ</h2>
+
+    <h3>どのような種類のデータを送ることができますか？</h3>
+
+    <p>SkyWay Android SDKは<a href="#connectoption-serialization">serialization</a>をbinaryまたはbinary-utf8にした場合、<a href="https://github.com/msgpack/msgpack-java">MessagePack</a>シリアライゼーションフォーマットを利用します。Byte, Short, Integer, Long, Float, Double, byte[], String, ByteBuffer, List, Mapを簡単な手順で送受信することができます。</p>
+          <pre>
+HashMap< String, String > map = new HashMap<>();
+for (int i = 0 ; 5 > i ; i++){
+    String strKey = String.format("%d", i);
+    String strValue = String.format("Value:%d", i);
+    map.put(strKey, strValue);
+  }
+Boolean bResult = _data.send(map);</pre>
+    <p>serializationの設定値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。</p>
+
+    <h3>SkyWay Android SDKを利用することができないシーンはありますか？</h3>
+
+    <p>シンメトリックNATの内側にいるクライアント同士はNATを超えることができないため、通信することができません。
+        ただし、TURNサーバを利用して接続を中継すれば回避することができます。必要であれば、SkyWayが提供するTURNサーバを利用するか別途用意してください。SkyWayが提供するTURNサーバを利用する場合は別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。TURNサーバの情報は、<code>Peer</code>コンストラクタのオプションで設定することができます。</p>
+    <h3>TURNサーバはどのようにして利用するのでしょうか？</h3>
+    <p>Peerオブジェクトを生成する際、PeerOption内のconfigプロパティにおいてIceConfigオブジェクトにURL等の情報を設定してください。</p>
+<pre>
+PeerOption options = new PeerOption();
+
+//設定例はサンプルです。利用時には適切なサーバを設定してください。
+IceConfig configTurn = new IceConfig();
+configTurn.url = "turn:homeo@turn.bistri.com:80";
+configTurn.credential = "homeo";
+options.config = {configStun,configTurn};
+
+Peer peer = new Peer(options);
+</pre>
+    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、オプションの設定は不要です。</p>
+    <h3>接続しようとしてるピアに接続できない場合はどうなりますか？</h3>
+
+    <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。</p>
+
+    <h3>ピアとつながらない場合は何を確認するべきでしょうか？</h3>
+    <p>ピア同士がシンメトリックNATの内側にいる可能性があります。この場合はTURNサーバを利用してください。</p>
+    <p>ファイアウォール等でUDPのポート3478（STUNサーバへの問い合わせに必要）をブロックしているかもしれません。STUNサーバへの問い合わせが可能な状況でご利用ください。</p>
+
+    <h3>遅延／帯域幅は?</h3>
+    <p>ピア同士のデータのやり取りは、TURNを利用する場合を除き、サーバを経由しないため、それが原因となる遅延などは発生しません。ピア同士の処理性能やネットワーク環境に依存します。</p>
+    <p>ピア同士のコネクション確立に関する遅延は、セッション情報の中継（以下、シグナリング）とユーザの識別という2つに分類できます。PeerJSでは、シグナリングの時間を短縮するために、XHRストリーミングリクエストでデータを送った後、WebSocketで送ります。ユーザの識別に関しては手動でIDを指定することで、サーバ側にてIDを生成する際のRTT（Round-Trip delay Time）を短縮することができます。</p>
+
+    <h3>対応OS</h3>
+    <p>Android 4.0.3+</p>
+
+    <h3>動作確認機種</h3>
+    <p>Nexus 5 2013、Nexus 6 2015、Xperia Z1 2013、ZenPhone 2014、Galaxy S5</p>
+
+    <h3>その他</h3>
+    <p><a href="https://groups.google.com/forum/#!forum/skywayjs">SkyWay Technical Forum Google Group(日本語/英語)</a></p>
+    <h3>免責事項</h3>
+    <p>本ドキュメントは<a href="http://peerjs.com/docs/">http://peerjs.com/docs/</a>を元に、NTTコミュニケーションズが提供するSkyWayを利用するための情報等を追記し公開しています。ドキュメント原本に関する個別問い合わせには応じることができませんので、予めご了承ください。</p>
+
+</section>
+
+<header class="left">
+    <h2>API Reference<a class="hide icon">&laquo;</a><a class="show icon">&raquo;</a></h2>
+</header>
+<header class="right">
+    <h2>Getting Started</h2>
+</header>
+
+<section class="api">
+    {{{html_Android}}}
+</section>
+</div>
