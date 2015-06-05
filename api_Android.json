@@ -436,7 +436,7 @@
         "name": "send",
         "type": "METHOD",
         "snippet": "BOOL bResult = dataConnection.send(data);",
-        "description": "接続中のリモートピアにデータを送信します。プロパティ<a href='#dataconnection-serialization'><code>serialization</code></a>の値によって送信処理が変わります。serializationの値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。",
+        "description": "接続中のリモートピアにデータを送信します。プロパティ<a href='#dataconnection-serialization'><code>serialization</code></a>の値によって送信処理が変わります。serializationの値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='https://github.com/nttcom/skyway-docs/blob/master/serialization.md' target='_blank'>こちら</a>をご覧ください。",
         "children": {
           "name": "data",
           "description": "送信するデータです。"
