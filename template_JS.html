@@ -1,15 +1,4 @@
-<head>
-    <title>PeerJS ドキュメント</title>
-    <meta charset="UTF-8" />
-    <meta property="og:locale" content="ja_JP" />
-    <meta name="viewport" content="width=device-width, maximum-scale=1">
-    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,900' rel='stylesheet' type='text/css'>
-    <link href="./style.css" rel="stylesheet" type="text/css">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type="text/javascript" src="./index.js"></script>
-</head>
-
-<body>
+<div id="JS">
 <section class="start">
     <h1><a href="/skyway/">PeerJS</a> <span class="title">docs</span><span class="title skyway">SkyWay対応版</span></h1>
     <p><br>PeerJSは、WebRTCを利用したピア·ツー·ピアのデータ、ビデオ、オーディオ通信を簡単に実現することができます。このドキュメントでは、PeerJS APIの基本的な使い方を紹介します。PeerJSを用いた実装例をご覧になりたい方は, <a href="https://github.com/nttcom/peerjs/tree/master/examples">サンプル</a> ページを御覧ください。</P>
@@ -116,6 +105,7 @@ conn.send({
   evenBinary: new Blob([1,2,3]),
   andMore: {bool: true}
 });</pre>
+    <p>serializationの設定値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。</p>
 
     <h3>PeerJSを利用することができないシーンはありますか？</h3>
 
@@ -163,7 +153,6 @@ var peer = new Peer({
 </header>
 
 <section class="api">
-    {{{html}}}
+    {{{html_JS}}}
 </section>
-
-</body>
+</div>

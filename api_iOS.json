@@ -1,0 +1,902 @@
+[
+  {
+    "name": "SKWPeer",
+    "type": "CLASS",
+    "snippet": "SKWPeer* peer = [[SKWPeer alloc] initWithId:peerId options:options];<br>SKWPeer* peer = [[SKWPeer alloc] initWithOptions:options];",
+    "description": "他のpeerへ接続できるpeerです。また、他のpeerからのコネクションをlistenできます。",
+    "children": [
+      {
+        "name": "peerId",
+        "optional": true,
+        "type": "NSString",
+        "description": "他のピアがこのピアへ接続するときに使われるIDです。もしIDが指定されない場合、ブローカサーバがIDを生成します。<span class='warn'>このIDを利用してピアを特定するのは推奨しません。なぜならば、このIDはコネクションをブローカ(仲介)するのにのみ使われるように作成されているためです。特定に他の情報を使う場合は、<a href='#skwconnectoption-metadata'><code>metadata</code></a>の利用を推奨します。</span>"
+      },
+      {
+        "name": "options",
+        "optional": false,
+        "type": "<a href='#skwpeeroption'>SKWPeerOption</a>",
+        "description": "設定情報オブジェクトを指定します。"
+      },
+      {
+        "name": "connectWithId",
+        "type": "METHOD",
+        "snippet": "SKWDataConnection* dataConnection = [peer connectWithId:peerId];<br>SKWDataConnection* dataConnection = [peer connectWithId:peerId options:options];",
+        "description": "<code>id</code>で指定されたリモートのPeerへ接続し、SKWDataConnectionを返します。コネクションに失敗した場合は、<a href='#skwpeer-on-event-skw_peer_event_error'><code>error</code></a>イベントが呼び出されます。",
+        "children": [
+          {
+            "name": "peerId",
+            "type": "NSString",
+            "description": "リモートpeerのブローカーIDです(リモートpeerの<a href='#skwpeer-identity'><code>identity</code></a>です)。"
+          },
+          {
+            "name": "options",
+            "optional": true,
+            "type": "<a href='#skwconnectoption'>SKWConnectOption</a>",
+            "description": "設定情報オブジェクトを指定します。"
+          }
+        ]
+      },
+      {
+        "name": "callWithId",
+        "snippet": "SKWMediaConnection* mediaConnection = [peer callWithId:peerId stream:stream];<br>SKWMediaConnection* mediaConnection = [peer callWithId:peerId stream:stream options:options];",
+        "description": "<code>id</code>で指定されたリモートのpeerへ発信し、SKWMediaConnectionを返します。コネクションに失敗した場合に備え、<a href='#skwpeer-on-event-skw_peer_event_error'><code>error</code></a>イベントが発生します。",
+        "children": [
+          {
+            "name": "peerId",
+            "type": "NSString",
+            "description": "リモートpeerのブローカーID(リモートpeerの<a href='#skwpeer-identity'><code>identity</code></a>)です。"
+          },
+          {
+            "name": "stream",
+            "type": "<a href='#skwmediastream'>SKWMediaStream</a>",
+            "description": "使用するローカルメディアストリームです。"
+          },
+          {
+            "name": "options",
+            "optional": true,
+            "type": "<a href='#skwcalloption'>SKWCallOption</a>",
+            "description": "設定情報オブジェクトを指定します。"
+          }
+        ]
+      },
+
+      {
+        "name": "on",
+        "type": "METHOD",
+        "snippet": "[peer on:event callback:^(NSObject* obj)callback];",
+        "description": "SKWPeerのイベントコールバックBlockを設定します。",
+        "children": [
+          {
+            "name": "event",
+            "type": "SKWPeerEventEnum",
+            "description": "設定するイベント種別を指定します。",
+            "children": [
+              {
+                "name": "SKW_PEER_EVENT_OPEN",
+                "snippet": "[peer on:SKW_PEER_EVENT_OPEN callback:^(NSObject* ownId){ ... }];",
+                "description": "PeerServerへの接続が確立すると発生します。このイベントが発生する前にpeerを利用することもできますが、サーバへのメッセージはキューイングされます。<code>ownId</code>はブローカーIDです（SKWPeerコンストラクタで指定されるか、サーバによって割付けされます）。<span class='tip'>コネクションの速度が重要である場合、他のピアへ接続する前に、このイベントを待つべきではありません。</span> "
+              },
+              {
+                "name": "SKW_PEER_EVENT_CONNECTION",
+                "snippet": "[peer on:SKW_PEER_EVENT_CONNECTION callback:^(NSObject* dataConnection){ ... }];",
+                "description": "リモートピアと新しいdata connectionが確立すると発生します。callbackの引数はSKWDataConnectionクラスになります。"
+              },
+              {
+                "name": "SKW_PEER_EVENT_CALL",
+                "snippet": "[peer on:SKW_PEER_EVENT_CALL callback:^(NSObject* mediaConnection){ ... }];",
+                "description": "リモートのpeerがあなたに発信してきたときに発生します。callbackの引数はSKWMediaConnectionクラスになります。<code>mediaConnection</code>はこの時点でアクティブではありません。つまり、最初に応答する必要があります（<a href='#skwmediaconnection-answer'><code>[mediaConnection answer:stream];</code></a>）。その後、streamイベントをlistenできます。"
+              },
+              {
+                "name": "SKW_PEER_EVENT_CLOSE",
+                "snippet": "[peer on:SKW_PEER_EVENT_CLOSE callback:^(NSObject* obj){ ... }];",
+                "description": "ピアとの接続が<a href='#skwpeer-isdestroyed'>destroyed</a>となった場合に発生します。<span class='tip'>peerを確実にクリアするためには、peerが不要となった時点で、peer.destroy()の実行を推奨します。</span>"
+              },
+              {
+                "name": "SKW_PEER_EVENT_DISCONNECTED",
+                "snippet": "[peer on:SKW_PEER_EVENT_DISCONNECTED callback:^(NSObject* obj){ ... }];",
+                "description": "ピアとの接続が<a href='#skwpeer-isdisconnected'>disconnected</a>となった場合に発生します。"
+              },
+              {
+                "name": "SKW_PEER_EVENT_ERROR",
+                "snippet": "[peer on:SKW_PEER_EVENT_ERROR callback:^(NSObject* obj){ ... }];",
+                "description": "callbackの引数は<a href='#skwpeererror'>SKWPeerError</a>クラスになります。peerに対するエラーは、ほとんど常に致命的であり、peerを破壊します。ソケットから生じるエラーや、PeerConnectionsから生じるエラーは、このイベントに伝えられます。"
+              }
+            ]
+          },
+          {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+          }
+        ]
+      },
+
+      {
+        "name": "disconnect",
+        "type": "METHOD",
+        "snippet": "[peer disconnect];",
+        "description": "サーバとの接続をクローズします。既存のデータおよびメディア接続はそのままです。<a href='#skwpeer-isdisconnected'><code>disconnected</code></a>に<code>true</code>が設定されます。<span class='warn'>この操作は必ず実施してください。それぞれのPeerオブジェクトが利用不可能、またはコネクションを受信できません。idも（クラウド上の）サーバに没収されます。</span>"
+      },
+
+      {
+        "name": "reconnect",
+        "type": "METHOD",
+        "snippet": "[peer reconnect];",
+        "description": "シグナリングサーバとの再接続を行います。 peerIDは既に割当済みのIDを使用します。<a href='#skwpeer-disconnect'><code>disconnect</code></a>されたピアのみ再接続が可能で、<a href='#skwpeer-destroy'><code>destroy</code></a>されたピアは再接続できません。"
+      },
+
+      {
+        "name": "destroy",
+        "type": "METHOD",
+        "snippet": "[peer destroy];",
+        "description": "サーバへの接続をクローズし、すべての既存のコネクションを終了します。<a href='#skwpeer-isdestroyed'><code>destroyed</code></a>は<code>true</code>に設定されます。<span class='warn'>この操作は必ず実施してください。それぞれのPeerオブジェクトが利用不可能、またはコネクションを受信できません。idも（クラウド上の）サーバに没収されます。さらに、データコネクション・メディアコネクションもクローズされます。</span>"
+      },
+
+      {
+        "name": "listAllPeers",
+        "type": "METHOD",
+        "snippet": "[peer listAllPeers:^(NSArray* aryPeers){ ... }];",
+        "description": "SkyWayが提供するRestAPIにアクセスし、APIキー毎のアクティブなPeerIDを取得します。NSStringのNSArrayが渡されます。"
+      },
+
+      {
+        "name": "identity",
+        "type": "NSString",
+        "description": "peerのブローカーIDです。もしIDが<a href='#skwpeer'>SKWPeerクラス</a>で指定されない場合、<a href='#skwpeer-on-event-skw_peer_event_open'><code>open</code></a>が発生するまで、<code>undefined</code>のままです。"
+      },
+
+      {
+        "name": "connections",
+        "type": "NSMutableDictionary",
+        "description": "コネクション接続管理オブジェクトです。リモートpeerのIDがkeyとして、peerと関連付けされるコネクションを持つハッシュです。<span class='tip'>このハッシュに頼るよりも、自身でコネクションを追跡管理することを推奨します。</span>"
+      },
+
+      {
+        "name": "isDisconnected",
+        "type": "BOOL",
+        "description": "PeerServerとのアクティブなコネクションがある場合は、<code>NO</code> です。"
+      },
+
+      {
+        "name": "isDestroyed",
+        "type": "BOOL",
+        "description": "このpeerにおける、全接続が利用されていない場合は<code>YES</code>です。"
+      }
+    ]
+  },
+
+  {
+    "name": "SKWPeerOption",
+    "type": "CLASS",
+    "snippet": "SKWPeerOption* options = [[SKWPeerOption alloc] init];",
+    "description": "SKWPeer初期化時のオプション設定情報クラスです。",
+    "children": [
+      {
+        "name": "key",
+        "type": "NSString",
+        "description": "クラウド上のPeerServerを利用するためのAPIキーです。"
+      },
+      {
+        "name": "domain",
+        "type": "NSString",
+        "description": "SkyWayでの開発者登録時に指定したWebサーバのドメイン文字列を指定します。"
+      },
+      {
+        "name": "host",
+        "optional": true,
+        "type": "NSString",
+        "description": "サーバのホスト名です。デフォルトは<code>skyway.io</code>となります。"
+
+      },
+      {
+        "name": "port",
+        "optional": true,
+        "type": "NSInteger",
+        "description": "サーバのポート番号です。デフォルトは<code>443</code>番となります。"
+
+      },
+      {
+        "name": "path",
+        "optional": true,
+        "type": "NSString",
+        "description": "自身のPeerServerが動作している場所のpathです。デフォルトは、<code>'/'</code>です。"
+      },
+      {
+        "name": "secure",
+        "optional": true,
+        "type": "BOOL",
+        "description": "SSLを利用する場合は、<code>YES</code>にします。skyway.ioはSSLを利用するため、デフォルトは、<code>YES</code>です。"
+      },
+      {
+        "name": "turn",
+        "optional": true,
+        "type": "BOOL",
+        "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>YES</code>にします。デフォルトは、<code>NO</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
+      },
+      {
+        "name": "config",
+        "optional": true,
+        "type": "NSArray <SKWIceConfig>",
+        "description": "STUN/TURNサーバ設定オブジェクト<a href='#skwiceconfig'><code>SKWIceConfig</code></a>のNSArray*を設定します。デフォルトでは、SkyWayのSTUNサーバ(stun:stun.skyway.io:3478)が設定されています。尚、SkyWayが提供するTURNサーバを利用する場合は、TURNサーバについての記載は不要です。"
+      },
+      {
+        "name": "debug",
+        "optional": true,
+        "type": "SKWDebugLevelEnum",
+        "description": "debugレベルにしたがってログを出力します。デフォルト値は<code>SKW_DEBUG_LEVEL_NO_LOGS</code>です。",
+        "children": [
+          {
+            "name": "SKW_DEBUG_LEVEL_NO_LOGS",
+            "description": "ログを出力しません。"
+          },
+          {
+            "name": "SKW_DEBUG_LEVEL_ONLY_ERROR",
+            "description": "エラーのみログ出力します。"
+          },
+          {
+            "name": "SKW_DEBUG_LEVEL_ERROR_AND_WARNING",
+            "description": "エラーと警告をログ出力します。"
+          },
+          {
+            "name": "SKW_DEBUG_LEVEL_ALL_LOGS",
+            "description": "すべてのログを出力します。"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "SKWIceConfig",
+    "snippet": "SKWIceConfig* config = [[SKWIceConfig alloc] init];",
+    "type": "CLASS",
+    "description": "SKWPeer初期化時のSTUN/TURNサーバ設定情報クラスです。",
+    "children":[
+      {
+        "name": "url",
+        "type": "NSString",
+        "description": "STUN/TURN サーバの URL を指定します。"
+      },
+      {
+        "name": "username",
+        "optional": true,
+        "type": "NSString",
+        "description": "ユーザー名が必要な場合に設定します。"
+      },
+      {
+        "name": "credential",
+        "optional": true,
+        "type": "NSString",
+        "description": "パスワードが必要な場合に設定します。"
+      }
+    ]
+  },
+
+  {
+    "name": "SKWConnectOption",
+    "type": "CLASS",
+    "snippet": "SKWConnectOption* options = [[SKWConnectOption alloc] init];",
+    "description": "SKWPeerのconnect実行時のオプション設定情報クラスです。",
+    "children": [
+      {
+        "name": "label",
+        "type": "NSString",
+        "description": "data connectionを識別するためのユニークなラベルです。もし特定されていない場合は、ランダムに生成されます。dataConnection.<a href='#skwdataconnection-label'><code>label</code></a>を通じてアクセスできます。"
+      },
+      {
+        "name": "metadata",
+        "type": "NSString",
+        "description": "コネクションに関連付けされるメタデータで、コネクションを開始したpeerに渡されます。dataConnection.<a href='#skwdataconnection-metadata'><code>metadata</code></a>を通じてアクセスできます。serialize可能です。"
+      },
+      {
+        "name": "serialization",
+        "type": "SKWSerializationEnum",
+        "description": "データ通信形式を指定します。デフォルトで SKW_SERIALIZATION_BINARYが設定されます。この値によってdataConnection.<a href='#skwdataconnection-send'><code>send</code></a>で送れるデータ型が変化します。dataConnection.<a href='#skwdataconnection-serialization'><code>serialization</code></a>にて確認できます。",
+        "children": [
+          {
+            "name": "SKW_SERIALIZATION_BINARY",
+            "description": "データ通信形式を<code>binary</code>にします。"
+          },
+          {
+            "name": "SKW_SERIALIZATION_BINARY_UTF8",
+            "description": "データ通信形式を<code>binary-utf8</code>にします。"
+          },
+          {
+            "name": "SKW_SERIALIZATION_JSON",
+            "description": "データ通信形式を<code>json</code>にします。"
+          },
+          {
+            "name": "SKW_SERIALIZATION_NONE",
+            "description": "データ通信形式を<code>none</code>にします。"
+          }
+        ]
+      },
+      {
+        "name": "reliable",
+        "type": "BOOL",
+        "description": "data channelに信頼性をもたせるか(例えば、大きなファイルの転送）、もたせないか（例えば、ゲームやストリーミング）を指定可能です。デフォルトはNOです。"
+      }
+    ]
+  },
+
+
+  {
+    "name": "SKWCallOption",
+    "type": "CLASS",
+    "snippet": "SKWCallOption* options = [[SKWCallOption alloc] init];",
+    "description": "SKWPeerのcall実行時のオプション設定情報クラスです。",
+    "children": [
+      {
+        "name": "metadata",
+        "description": "コネクションと関連付けされるメタデータ文字列です。"
+      }
+    ]
+  },
+
+  {
+    "name": "SKWPeerError",
+    "type": "CLASS",
+    "description": "”error”イベント時に取得できるクラスです。OS からのエラー情報が存在した場合、エラー情報オブジェクトがプロパティerrorに参照されます。",
+    "children": [
+      {
+        "name": "type",
+        "type": "SKWPeerErrorEnum",
+        "description": "列挙型のエラータイプが設定されます。",
+        "children": [
+          {
+            "name": "SKW_PEER_ERR_NO_ERROR",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "エラーがない状態です"
+          },
+          {
+            "name": "SKW_PEER_ERR_BROWSER_INCOMPATIBLE",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "利用しようとしているwebRTC機能のすべて、またはいくつかについて、サポートしていません。"
+          },
+          {
+            "name": "SKW_PEER_ERR_INVALID_ID",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "SKWPeerクラスへ渡されたIDに、不正な文字が含まれています。"
+          },
+          {
+            "name": "SKW_PEER_ERR_INVALID_KEY",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "SKWPeerクラスへ渡されたAPI Keyが不正な文字列を含んでいます。または、API Keyが含まれていません（クラウド上のサーバを利用する場合のみ）。"
+          },
+          {
+            "name": "SKW_PEER_ERR_UNAVAILABLE_ID",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "SKWPeerクラスへ渡されたIDは既に利用されています。"
+          },
+          {
+            "name": "SKW_PEER_ERR_SSL_UNAVAILABLE",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "SSL関連のエラーです。"
+          },
+          {
+            "name": "SKW_PEER_ERR_DISCONNECTED",
+            "type": "Error",
+            "description": "既にこのPeerとの接続が切断されており、新しいコネクションを作成できません。"
+          },
+          {
+            "name": "SKW_PEER_ERR_SERVER_ERROR",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "サーバに到達できません。"
+          },
+          {
+            "name": "SKW_PEER_ERR_SOCKET_ERROR",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "ソケットからのエラーです。"
+          },
+          {
+            "name": "SKW_PEER_ERR_SOCKET_CLOSED",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "ソケットが予期せずクローズしました。"
+          },
+          {
+            "name": "SKW_PEER_ERR_NETWORK",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "シグナリングサーバとのネットワークエラーです。"
+          },
+          {
+            "name": "SKW_PEER_ERR_PEER_UNAVAILABLE",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "接続できないPeerに接続しようとしています。"
+          },
+          {
+            "name": "SKW_PEER_ERR_WEBRTC",
+            "type": "Error",
+            "tags": ["fatal"],
+            "description": "WebRTC関連での何からのエラーです。"
+          }
+        ]
+      },
+      {
+        "name": "message",
+        "type": "NSString",
+        "description": "エラーメッセージです。"
+      },
+      {
+        "name": "error",
+        "type": "NSError",
+        "description": "OSからのエラー情報オブジェクトです。"
+      }
+    ]
+  },
+
+  {
+    "name": "SKWDataConnection",
+    "type": "CLASS",
+    "description": "WebRTCのData Channelをラップします。このオブジェクトを得るためには、SKWPeerの<a href='#skwpeer-connectwithid'><code>connectWithId</code></a>を使うか、<a href='#skwpeer-on-event-skw_peer_event_connection'><code>SKW_PEER_EVENT_CONNECTION</code></a>発生時に渡されるオブジェクトを使用してください。",
+    "children": [
+      {
+        "name": "send",
+        "type": "METHOD",
+        "snippet": "BOOL bResult = [dataConnection send:data];",
+        "description": "接続中のリモートピアにデータを送信します。プロパティ<a href='#skwdataconnection-serialization'><code>serialization</code></a>の値によって送信処理が変わります。serializationの値による、各プラットフォーム間(JavaScript, iOS, Android)でのデータ通信の可否と、送受信時のデータ型に関する情報については<a href='http://nttcom.github.io/skyway/docs/serialization.md'>こちら</a>をご覧ください。",
+        "children": {
+          "name": "data",
+          "description": "送信するデータを設定します。"
+        }
+      },
+
+      {
+        "name": "close",
+        "type": "METHOD",
+        "snippet": "[dataConnection close];",
+        "description": "DataChannelとPeerConnectionを解放して、コネクションをクローズします。"
+      },
+
+      {
+        "name": "on",
+        "type": "METHOD",
+        "snippet": "[dataConnection on:event callback:^(NSObject* obj)callback];",
+        "description": "SKWDataConnectionのイベントコールバックBlockを設定します。",
+        "children": [
+          {
+            "name": "event",
+            "type": "SKWDataConnectionEventEnum",
+            "description": "設定するイベント種別を指定します。",
+            "children": [
+              {
+                "name": "SKW_DATACONNECTION_EVENT_DATA",
+                "snippet": "[dataConnection on:SKW_DATACONNECTION_EVENT_DATA callback:^(NSObject* obj){ ... }];",
+                "description": "リモートpeerからデータを受信した場合に発生します。"
+              },
+              {
+                "name": "SKW_DATACONNECTION_EVENT_OPEN",
+                "snippet": "[dataConnection on:SKW_DATACONNECTION_EVENT_OPEN callback:^(NSObject* obj){ ... }];",
+                "description": "コネクションが利用可能となった場合に発生します。"
+              },
+              {
+                "name": "SKW_DATACONNECTION_EVENT_CLOSE",
+                "snippet": "[dataConnection on:SKW_DATACONNECTION_EVENT_CLOSE callback:^(NSObject* obj){ ... }];",
+                "description": "あなたが、またはリモートのpeerがdata connectionをクローズした場合に発生します。"
+              },
+              {
+                "name": "SKW_DATACONNECTION_EVENT_ERROR",
+                "snippet": "[dataConnection on:SKW_DATACONNECTION_EVENT_ERROR callback:^(NSObject* obj){ ... }];",
+                "description": "callbackの引数は<a href='#skwpeererror'>SKWPeerError</a>クラスになります。"
+              }
+            ]
+          },
+          {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+          }
+        ]
+      },
+
+      {
+        "name": "bufferSize",
+        "type": "NSUInteger",
+        "description": "バッファが一杯になった場合に、キューされるメッセージのサイズです。"
+      },
+      {
+        "name": "dataChannel",
+        "type": "<a href='#skwdatachannel'>SKWDataChannel</a>",
+        "description": "コネクションに関連付けされたRTCDataChannelオブジェクトへの参照です。"
+      },
+      {
+        "name": "label",
+        "type": "NSString",
+        "description": "コネクションが開始されたときにアサインされる、または指定されるオプションのラベルです。"
+      },
+      {
+        "name": "metadata",
+        "type": "NSObject",
+        "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータです。"
+      },
+      {
+        "name": "isOpen",
+        "type": "BOOL",
+        "description": "コネクションがopenであり、読み込み/書き込みの準備ができている場合に<code>YES</code>になります。"
+      },
+      {
+        "name": "peerConnection",
+        "type": "RTCPeerConnection",
+        "description": "コネクションに関連付けされる、RTCPeerConnectionオブジェクトです。"
+      },
+      {
+        "name": "peer",
+        "type": "NSString",
+        "description": "コネクションの相手側のpeer IDです。"
+      },
+      {
+        "name": "reliable",
+        "type": "BOOL",
+        "description": "信頼性のあるdata channelの場合は<code>YES</code>です。コネクションの開始時に定義されます。"
+      },
+      {
+        "name": "serialization",
+        "type": "SKWSerializationEnum",
+        "description": "コネクションを通じて送信されるデータのserializeフォーマットです。コネクションの開始時に定義されます",
+        "children": [
+          {
+            "name": "SKW_SERIALIZATION_BINARY",
+            "description": "データ通信形式が<code>binary</code>の時にこの値が返されます。"
+          },
+          {
+            "name": "SKW_SERIALIZATION_BINARY_UTF8",
+            "description": "データ通信形式が<code>binary-utf8</code>の時にこの値が返されます。"
+          },
+          {
+            "name": "SKW_SERIALIZATION_JSON",
+            "description": "データ通信形式が<code>json</code>の時にこの値が返されます。"
+          },
+          {
+            "name": "SKW_SERIALIZATION_NONE",
+            "description": "データ通信形式が<code>none</code>の時にこの値が返されます。"
+          }
+        ]
+      },
+      {
+        "name": "type",
+        "type": "NSString",
+        "description": "data connectionでは、常に<code>'data'</code>が設定されます。"
+      }
+    ]
+  },
+
+  {
+    "name": "SKWMediaConnection",
+    "type": "CLASS",
+    "description": "WebRTCのmedia streamをラップします。このオブジェクトを得るためには、SKWPeerの<a href='#skwpeer-callwithid'><code>callWithId</code></a>を使うか、<a href='#skwpeer-on-event-skw_peer_event_call'><code>SKW_PEER_EVENT_CALL</code></a>発生時に渡されるオブジェクトを使用してください。",
+    "children": [
+      {
+        "name": "answer",
+        "type": "METHOD",
+        "snippet": "[mediaConnection answer];<br>[mediaConnection answer:stream];",
+        "description": "<a href='#skwpeer-on-event-skw_peer_event_call'><code>call</code></a>イベントを受信した場合に、応答するためにコールバックにて与えられるmedia connectionにて<code>answer</code>を呼び出せます。また、オプションで自身のmedia streamを設定できます。",
+        "children": {
+          "name": "stream",
+          "optional": true,
+          "type": "<a href='#skwmediastream'>SKWMediaStream</a>",
+          "description": "SKWNavigatorのgetUserMediaによって取得される<a href='#skwmediastream'><code>SKWMediaStream</code></a>です。"
+        }
+      },
+      {
+        "name": "close",
+        "type": "METHOD",
+        "snippet": "[media close];",
+        "description": "media connectionをクローズします。"
+      },
+      {
+        "name": "on",
+        "type": "METHOD",
+        "snippet": "[mediaConnection on:event callback:^(NSObject* obj)callback];",
+        "description": "SKWMediaConnectionのイベントコールバックBlockを設定します。",
+        "children": [
+          {
+            "name": "event",
+            "type": "SKWMediaConnectionEnum",
+            "description": "設定するイベント種別を指定します。",
+            "children": [
+              {
+                "name": "SKW_MEDIACONNECTION_EVENT_STREAM",
+                "snippet": "[mediaConnection on:SKW_MEDIACONNECTION_EVENT_STREAM callback:^(NSObject* stream){ ... }];",
+                "description": "リモートのpeerが<code>stream</code>を追加したときに発生します。"
+              },
+              {
+                "name": "SKW_MEDIACONNECTION_EVENT_CLOSE",
+                "snippet": "[mediaConnection on:SKW_MEDIACONNECTION_EVENT_CLOSE callback:^(NSObject* obj){ ... }];",
+                "description": "あなたか、リモートのpeerがmedia connectionをクローズした時に発生します。"
+              },
+              {
+                "name": "SKW_MEDIACONNECTION_EVENT_ERROR",
+                "snippet": "[mediaConnection on:SKW_MEDIACONNECTION_EVENT_ERROR callback:^(NSObject* obj){ ... }];",
+                "description": "callbackの引数は<a href='#skwpeererror'>SKWPeerError</a>クラスになります。"
+              }
+            ]
+          },
+          {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+          }
+        ]
+      },
+      {
+        "name": "isOpen",
+        "type": "BOOL",
+        "description": "media connectionがアクティブなとき（例えば、呼び出しにたいして、応答があった後）に、YESとなります。もし片方向通話のために、最大待ち時間を設定したい場合に、これをチェックできます。"
+      },
+      {
+        "name": "metadata",
+        "type": "NSObject",
+        "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータです。"
+      },
+      {
+        "name": "peer",
+        "type": "NSString",
+        "description": "コネクションの相手側のpeer IDです。"
+      },
+      {
+        "name": "type",
+        "type": "NSString",
+        "description": "media connectionでは、常に<code>'media'</code>が設定されます。"
+      }
+    ]
+  },
+
+  {
+    "name": "SKWMediaStream",
+    "type": "CLASS",
+    "children": [
+      {
+        "name": "close",
+        "type": "METHOD",
+        "snippet": "[stream close];",
+        "description": "メディアストリームをすべて閉じます。"
+      },
+      {
+        "name": "getVideoTracks",
+        "type": "METHOD",
+        "snippet": "NSUInteger videos = [stream getVideoTracks];",
+        "description": "メディアストリームに追加されているビデオトラック数を取得します。"
+      },
+      {
+        "name": "setEnableVideoTrack",
+        "type": "METHOD",
+        "snippet": "[stream setEnableVideoTrack:pos enable:enable];",
+        "description": "メディアストリームに追加済みのビデオトラック再生状態を設定します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "NSUInteger",
+            "description": "ビデオトラック番号 (0以上の整数)を選択します。"
+          },
+          {
+            "name": "enable",
+            "type": "BOOL",
+            "description": "<code>YES</code>なら再生し、<code>NO</code>なら停止します"
+          }
+        ]
+      },
+      {
+        "name": "getEnableVideoTrack",
+        "type": "METHOD",
+        "snippet": "BOOL enable = [stream getEnableVideoTrack:pos];",
+        "description": "メディアストリームに追加済みのビデオトラック再生状態を取得します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "NSUInteger",
+            "description": "ビデオトラック番号 (0以上の整数)を選択します。"
+          }
+        ]
+      },
+      {
+        "name": "getAudioTracks",
+        "type": "METHOD",
+        "snippet": "NSUInteger audios = [stream getAudioTracks];",
+        "description": "メディアストリームに追加されているオーディオトラック数を取得します。"
+      },
+      {
+        "name": "setEnableAudioTrack",
+        "type": "METHOD",
+        "snippet": "[stream setEnableAudioTrack:pos enable:enable];",
+        "description": "メディアストリームに追加済みのオーディオトラック再生状態を設定します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "NSUInteger",
+            "description": "オーディオトラック番号 (0以上の整数)を選択します。"
+          },
+          {
+            "name": "enable",
+            "type": "BOOL",
+            "description": "<code>YES</code>なら再生し、<code>NO</code>なら停止します"
+          }
+        ]
+      },
+      {
+        "name": "getEnableAudioTrack",
+        "type": "METHOD",
+        "snippet": "BOOL enable = [stream getEnableAudioTrack:pos];",
+        "description": "メディアストリームに追加済みのオーディオトラック再生状態を取得します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "NSUInteger",
+            "description": "オーディオトラック番号 (0以上の整数)を選択します。"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "SKWVideo",
+    "type": "OBJECT",
+    "snippet": "SKWVideo* video = [[SKWVideo alloc] initWithFrame:(CGRect)rect];",
+    "description": "映像を表示するレンダラービュー オブジェクトです。",
+    "children": [
+      {
+        "name": "addSrc",
+        "type": "METHOD",
+        "snippet": "[video addSrc:stream track:trackNo];",
+        "description": "メディアソースとして、 指定のメディアストリーム・トラック番号を追加します。",
+        "children": [
+          {
+            "name": "stream",
+            "type": "<a href='#skwmediastream'>SKWMediaStream</a>",
+            "description": "追加するメディアストリームです。"
+          },
+          {
+            "name": "trackNo",
+            "type": "NSUInteger",
+            "description": "追加するビデオトラック番号 (0以上の整数)です。"
+          }
+        ]
+      },
+      {
+        "name": "removeSrc",
+        "type": "METHOD",
+        "snippet": "[video removeSrc:stream track:trackNo];",
+        "description": "メディアソースとして使用していたメディアストリーム・トラック番号を削除します。",
+        "children": [
+          {
+            "name": "stream",
+            "type": "<a href='#skwmediastream'>SKWMediaStream</a>",
+            "description": "削除するメディアストリームです。"
+          },
+          {
+            "name": "trackNo",
+            "type": "NSUInteger",
+            "description": "削除するビデオトラック番号 (0以上の整数)です。"
+          }
+        ]
+      },
+      {
+        "name": "setDidChangeVideoSizeCallback",
+        "type": "METHOD",
+        "snippet": "[video setDidChangeVideoSizeCallback:^(CGSize size)callback",
+        "description": "映像サイズが変更された場合に、呼ばれるコールバックを設定します。",
+        "children": [
+          {
+            "name": "callback",
+            "description": "イベント発生時に実行するBlockを設定します。"
+          }
+        ]
+      }
+    ]
+  },
+
+
+  {
+    "name": "SKWNavigator",
+    "type": "CLASS",
+    "description": "映像を取得するためのクラスです。",
+    "children": [
+      {
+        "name": "initialize",
+        "type": "METHOD",
+        "snippet": "[SKWNavigator initialize:peer];",
+        "description": "初期化を行います。",
+        "children": [
+          {
+            "name": "peer",
+            "type": "<a href='#skwpeer'>SKWPeer</a>",
+            "description": "作成・初期化済みのSKWPeerオブジェクト"
+          }
+        ]
+      },
+      {
+        "name": "terminate",
+        "type": "METHOD",
+        "snippet": "[SKWNavigator terminate];",
+        "description": "終了化を行います。"
+      },
+      {
+        "name": "getUserMedia",
+        "type": "METHOD",
+        "snippet": "SKWMediaStream* stream = [SKWNavigator getUserMedia:constraints];",
+        "description": "ローカルメディアストリームを取得します。",
+        "children": [
+          {
+            "name": "constraints",
+            "type": "<a href='#skwmediaconstraints'>SKWMediaConstraints</a>",
+            "description": "メディアストリームの設定です。"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "SKWMediaConstraints",
+    "type": "CLASS",
+    "description": "<a href='#skwnavigator'>SKWNavigator</a>のgetUserMedia実行時のオプション設定クラスです。",
+    "children": [
+      {
+        "name": "videoFlag",
+        "type": "BOOL",
+        "description": "映像使用を設定します。<code>YES</code>なら映像を有効に、<code>NO</code>なら映像を無効にします。デフォルトは<code>YES</code>です。"
+      },
+      {
+        "name": "audioFlag",
+        "type": "BOOL",
+        "description": "音声使用を設定します。<code>YES</code>なら音声を有効に、<code>NO</code>なら音声を無効にします。デフォルトは<code>YES</code>です。"
+      },
+      {
+        "name": "cameraPosition",
+        "type": "SKWCameraPositionEnum",
+        "description": "使用するカメラの位置を設定します。デフォルトはSKW_CAMERA_POSITION_FRONTになります。",
+        "children": [
+          {
+            "name": "SKW_CAMERA_POSITION_UNSPECIFIED",
+            "description": "一番始めに見つけたカメラを使用します。順序はシステムに依存します。"
+          },
+          {
+            "name": "SKW_CAMERA_POSITION_BACK",
+            "description": "アウトカメラを使用します。アウトカメラが見つからない場合は、一番始めに見つけたカメラを使用します。"
+          },
+          {
+            "name": "SKW_CAMERA_POSITION_FRONT",
+            "description": "インカメラを使用します。インカメラが見つからない場合は、一番始めに見つけたカメラを使用します。"
+          }
+        ]
+      },
+      {
+        "name": "maxWidth",
+        "type": "NSUInteger",
+        "description": "横ピクセル上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>640</code>となります。"
+      },
+      {
+        "name": "minWidth",
+        "type": "NSUInteger",
+        "description": "横ピクセル下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+      },
+      {
+        "name": "maxHeight",
+        "type": "NSUInteger",
+        "description": "縦ピクセル上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>640</code>となります。"
+      },
+      {
+        "name": "minHeight",
+        "type": "NSUInteger",
+        "description": "縦ピクセル下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+      },
+      {
+        "name": "maxFrameRate",
+        "type": "NSUInteger",
+        "description": "フレームレート上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>10</code>となります。"
+      },
+      {
+        "name": "minFrameRate",
+        "type": "NSUInteger",
+        "description": "フレームレート下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+      }
+    ]
+  }
+]
