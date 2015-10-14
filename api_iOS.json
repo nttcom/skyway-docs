@@ -731,6 +731,60 @@
             "description": "オーディオトラック番号 (0以上の整数)を選択します。"
           }
         ]
+      },
+      {
+        "name": "setCameraPosition",
+        "type": "METHOD",
+        "snippet": "BOOL result = [stream setCameraPosition:pos];",
+        "description": "ローカルiOSデバイスのメディアストリームの場合、カメラ位置を設定します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "SKWCameraPositionEnum",
+            "description": "使用するカメラの位置を設定します",
+            "children":[
+              {
+                "name": "SKW_CAMERA_POSITION_UNSPECIFIED",
+                "description": "一番始めに見つけたカメラを使用します。順序はシステムに依存します。"
+              },
+              {
+                "name": "SKW_CAMERA_POSITION_BACK",
+                "description": "アウトカメラを使用します。"
+              },
+              {
+                "name": "SKW_CAMERA_POSITION_FRONT",
+                "description": "インカメラを使用します。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "getCameraPosition",
+        "type": "METHOD",
+        "snippet": "SKWCameraPositionEnum pos = [stream getCameraPosition];",
+        "description": "ローカルiOSデバイスのメディアストリームの場合、現在のカメラ位置を取得します。",
+        "children": [
+          {
+            "name": "pos",
+            "type": "SKWCameraPositionEnum",
+            "description": "現在のカメラの位置です。",
+            "children":[
+              {
+                "name": "SKW_CAMERA_POSITION_UNSPECIFIED",
+                "description": "カメラの位置が不明です。"
+              },
+              {
+                "name": "SKW_CAMERA_POSITION_BACK",
+                "description": "アウトカメラです。"
+              },
+              {
+                "name": "SKW_CAMERA_POSITION_FRONT",
+                "description": "インカメラです。"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -870,32 +924,32 @@
       {
         "name": "maxWidth",
         "type": "NSUInteger",
-        "description": "横ピクセル上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>640</code>となります。"
+        "description": "横ピクセル上限を設定します。デフォルトは<code>640</code>となります。<br>maxWidth, minWidth, maxHeight, minHeightで指定できる有効値は、以下のようになります。正しい値、組み合わせでなかった時は、デフォルト値が適用されます。<span class='tip'>max (Width x Height): 640x480, 800x600, 960x540, 1280x720<br>min (Width x Height): 192x144, 352x288, 512x384, 640x480</span>"
       },
       {
         "name": "minWidth",
         "type": "NSUInteger",
-        "description": "横ピクセル下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+        "description": "横ピクセル下限を設定します。デフォルトは<code>192</code>となります。"
       },
       {
         "name": "maxHeight",
         "type": "NSUInteger",
-        "description": "縦ピクセル上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>640</code>となります。"
+        "description": "縦ピクセル上限を設定します。デフォルトは<code>480</code>となります。"
       },
       {
         "name": "minHeight",
         "type": "NSUInteger",
-        "description": "縦ピクセル下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+        "description": "縦ピクセル下限を設定します。デフォルトは<code>144</code>となります。"
       },
       {
         "name": "maxFrameRate",
         "type": "NSUInteger",
-        "description": "フレームレート上限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>10</code>となります。"
+        "description": "フレームレート上限を設定します。2〜30を指定することができます。デフォルトは<code>10</code>となります。"
       },
       {
         "name": "minFrameRate",
         "type": "NSUInteger",
-        "description": "フレームレート下限を設定します<code>0</code>を指定すると WebRTCエンジン依存となります。デフォルトは<code>0</code>となります。"
+        "description": "フレームレート下限を設定します。2〜30を指定することができます。デフォルトは<code>2</code>となります。"
       }
     ]
   }
