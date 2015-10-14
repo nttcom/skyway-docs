@@ -8,6 +8,8 @@
     <pre>AudioToolbox.framework
 AVFoundation.framework
 CoreMedia.framework
+CoreVideo.framework
+VideoToolbox.framework
 CoreGraphoics.framework
 Foundation.framework
 GLKit.framework
@@ -17,8 +19,9 @@ libstdc++.6.0.9.dylib
 libsqlite3.dylib
 libicucore.dylib</pre>
     <h3>2. SkyWay iOS SDKのインポート</h3>
-    <p>SkyWay.frameworkをXcodeプロジェクトに追加後、SkyWay iOS SDKのヘッダファイルをインポートしてください。</p>
+    <p>SkyWay.frameworkをXcodeプロジェクトに追加後、SkyWay iOS SDKのヘッダファイルをインポートしてください。また、Build SettingsのLinking > Other Linker Flagsに-ObjCが設定されているか確認してください。</p>
     <pre>#import &lt;SkyWay/SKWPeer.h&gt;</pre>
+    <p>※現在Bitcodeには内部ライブラリの関係上、対応しておりません。Xcode7以上をお使いの方は、Build SettingsのBuild Options > Enable BitcodeをNOに設定してください。</p>
     <h3>3. SKWPeerオブジェクトを作成</h3>
     <p>SKWPeerオブジェクトは、Peerコネクションを生成、受信する為に利用します。</p>
     <pre>SKWPeerOption* options = [[SKWPeerOption alloc] init];
@@ -165,7 +168,7 @@ SKWPeer* peer = [[SKWPeer alloc] initWithOptions:options];
     <p>iOS 7+</p>
 
     <h3>動作確認機種</h3>
-    <p>iPhone 5+、iPodTouch 5+、iPad 2+</p>
+    <p>iPhone 5+、iPodTouch 6+、iPad 2+</p>
 
     <h3>その他</h3>
     <p><a href="https://groups.google.com/forum/#!forum/skywayjs">SkyWay Technical Forum Google Group(日本語/英語)</a></p>
