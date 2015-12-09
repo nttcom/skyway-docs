@@ -707,10 +707,15 @@
             "description": "オーディオトラック番号を選択します。オーディオトラック番号は０以上が設定されます。"
           }
         ]
+      },
+      {
+        "name": "switchCamera",
+        "type": "METHOD",
+        "snippet": "Boolean enable = stream.switchCamera();",
+        "description": "ローカルメディアストリームの場合、可能であればカメラの切替を行います"
       }
     ]
   },
-
   {
     "name": "Canvas",
     "type": "OBJECT",

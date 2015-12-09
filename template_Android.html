@@ -18,7 +18,7 @@
 </pre>
     <h3>2. SkyWay Android SDKのインポート</h3>
     <p>SkyWay.aarをアプリケーションに追加後にSkyWay Android SDKのクラスファイルをインポートしてください。</p>
-    <pre>#import &lt;io.skyway.Peer.*&gt;</pre>
+    <pre>#import io.skyway.Peer.*;</pre>
     <h3>3. Peerオブジェクトを作成</h3>
     <p>Peerオブジェクトは、Peerコネクションを生成、受信する為に利用します。</p>
     <pre>PeerOption options = new PeerOption();
@@ -150,7 +150,7 @@ options.config = {configStun,configTurn};
 
 Peer peer = new Peer(options);
 </pre>
-    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、オプションの設定は不要です。</p>
+    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、PeerOption.turnをtrueに設定してください。IceConfigの設定は不要です。</p>
     <h3>接続しようとしてるピアに接続できない場合はどうなりますか？</h3>
 
     <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。</p>
