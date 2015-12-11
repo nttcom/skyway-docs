@@ -18,7 +18,7 @@
 </pre>
     <h3>2. SkyWay Android SDKのインポート</h3>
     <p>SkyWay.aarをアプリケーションに追加後にSkyWay Android SDKのクラスファイルをインポートしてください。</p>
-    <pre>#import &lt;io.skyway.Peer.*&gt;</pre>
+    <pre>#import io.skyway.Peer.*;</pre>
     <h3>3. Peerオブジェクトを作成</h3>
     <p>Peerオブジェクトは、Peerコネクションを生成、受信する為に利用します。</p>
     <pre>PeerOption options = new PeerOption();
@@ -150,7 +150,7 @@ options.config = {configStun,configTurn};
 
 Peer peer = new Peer(options);
 </pre>
-    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、オプションの設定は不要です。</p>
+    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、PeerOption.turnをtrueに設定してください。IceConfigの設定は不要です。</p>
     <h3>接続しようとしてるピアに接続できない場合はどうなりますか？</h3>
 
     <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。</p>
@@ -168,6 +168,7 @@ Peer peer = new Peer(options);
 
     <h3>動作確認機種</h3>
     <p>Nexus 5 2013、Nexus 6 2015、Xperia Z1 2013、ZenPhone 2014、Galaxy S5</p>
+    <p>Nexus 5(Android 6.0)では、内部ライブラリの影響でローカルストリームを取得できない不具合がございます。</p>
 
     <h3>その他</h3>
     <p><a href="https://groups.google.com/forum/#!forum/skywayjs">SkyWay Technical Forum Google Group(日本語/英語)</a></p>
