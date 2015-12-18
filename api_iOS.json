@@ -210,7 +210,7 @@
         "name": "turn",
         "optional": true,
         "type": "BOOL",
-        "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>YES</code>にします。デフォルトは、<code>NO</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
+        "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>YES</code>にします。デフォルトは、<code>YES</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
       },
       {
         "name": "config",
