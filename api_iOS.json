@@ -210,7 +210,7 @@
         "name": "turn",
         "optional": true,
         "type": "BOOL",
-        "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>YES</code>にします。デフォルトは、<code>NO</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
+        "description": "SkyWayが提供するTURNサーバを利用する場合は、<code>YES</code>にします。デフォルトは、<code>YES</code>です。利用には別途<a href='https://skyway.io/ds/turnrequest' target='_blank'>申請</a>が必要です。"
       },
       {
         "name": "config",
@@ -327,6 +327,7 @@
     "children": [
       {
         "name": "metadata",
+        "type": "NSString",
         "description": "コネクションと関連付けされるメタデータ文字列です。"
       }
     ]
@@ -514,7 +515,7 @@
       },
       {
         "name": "metadata",
-        "type": "NSObject",
+        "type": "NSString",
         "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータです。"
       },
       {
@@ -632,7 +633,7 @@
       },
       {
         "name": "metadata",
-        "type": "NSObject",
+        "type": "NSString",
         "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータです。"
       },
       {
@@ -785,6 +786,12 @@
             ]
           }
         ]
+      },
+      {
+        "name": "switchCamera",
+        "type": "METHOD",
+        "snippet": "Bool result = [stream switchCamera];",
+        "description": "ローカルiOSデバイスのメディアストリームの場合、可能であればカメラの切替を行います。カメラが変更された場合は<code>true</code>、それ以外は<code>false</code>を返します。"
       }
     ]
   },
