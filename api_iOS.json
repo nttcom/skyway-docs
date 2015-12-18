@@ -327,6 +327,7 @@
     "children": [
       {
         "name": "metadata",
+        "type": "NSString",
         "description": "コネクションと関連付けされるメタデータ文字列です。"
       }
     ]
@@ -514,7 +515,7 @@
       },
       {
         "name": "metadata",
-        "type": "NSObject",
+        "type": "NSString",
         "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータです。"
       },
       {
@@ -632,7 +633,7 @@
       },
       {
         "name": "metadata",
-        "type": "NSObject",
+        "type": "NSString",
         "description": "コネクションが開始されたときに、コネクションと関連付けされるメタデータです。"
       },
       {
