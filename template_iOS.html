@@ -151,7 +151,7 @@ option.config = @[configStun,configTurn];
 
 SKWPeer* peer = [[SKWPeer alloc] initWithOptions:options];
 </pre>
-    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、SKWPeerOption.turnをYESに設定してください。SKWIceConfigの設定は不要です。</p>
+    <p>尚、SkyWayが提供するTURNサーバを利用する場合は、オプションの設定は不要です。</p>
     <h3>接続しようとしてるピアに接続できない場合はどうなりますか？</h3>
 
     <p>ピアに接続できない場合はPeerServerにて接続要求を5秒間保持します。ピアが一時的に再接続するような場合、コネクションを切らずに保持することができます。</p>
