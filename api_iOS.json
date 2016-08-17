@@ -893,7 +893,6 @@
       }
     ]
   },
-
   {
     "name": "SKWMediaConstraints",
     "type": "CLASS",
@@ -910,9 +909,24 @@
         "description": "音声使用を設定します。<code>YES</code>なら音声を有効に、<code>NO</code>なら音声を無効にします。デフォルトは<code>YES</code>です。"
       },
       {
+        "name": "cameraMode",
+        "type": "SKWCameraModeEnum",
+        "description": "カメラモードを設定します。デフォルトは<code>SKW_CAMERA_MODE_SWITCHABLE</code>です。",
+        "children": [
+          {
+            "name": "SKW_CAMERA_MODE_SWITCHABLE",
+            "description": "メディアストリームを送信中にカメラの切り替えが可能です。"
+          },
+          {
+            "name": "SKW_CAMERA_MODE_ADJUSTABLE",
+            "description": "カメラのwidth/heightを変更可能です。"
+          }
+        ]
+      },
+      {
         "name": "cameraPosition",
         "type": "SKWCameraPositionEnum",
-        "description": "使用するカメラの位置を設定します。デフォルトはSKW_CAMERA_POSITION_FRONTになります。",
+        "description": "使用するカメラの位置を設定します。デフォルトはSKW_CAMERA_POSITION_FRONTです。cameraModeが<code>SKW_CAMERA_MODE_ADJUSTABLE</code>の時にのみ有効です。",
         "children": [
           {
             "name": "SKW_CAMERA_POSITION_UNSPECIFIED",
@@ -931,32 +945,22 @@
       {
         "name": "maxWidth",
         "type": "NSUInteger",
-        "description": "横ピクセル上限を設定します。デフォルトは<code>640</code>となります。<br>maxWidth, minWidth, maxHeight, minHeightで指定できる有効値は、以下のようになります。正しい値、組み合わせでなかった時は、デフォルト値が適用されます。<span class='tip'>max (Width x Height): 640x480, 800x600, 960x540, 1280x720<br>min (Width x Height): 192x144, 352x288, 512x384, 640x480</span>"
+        "description": "横ピクセル上限を設定します。デフォルトは<code>640</code>となります。<br>maxWidth, minWidth, maxHeight, minHeightで指定できる有効値は、以下のようになります。正しい値、組み合わせでなかった時は、デフォルト値が適用されます。cameraModeが<code>SKW_CAMERA_MODE_ADJUSTABLE</code>の時にのみ有効です。<span class='tip'>max(Width x Height): 640x480, 352x288 <br>min (Width x Height): 192x144, 352x288, 512x384, 640x480</span>"
       },
       {
         "name": "minWidth",
         "type": "NSUInteger",
-        "description": "横ピクセル下限を設定します。デフォルトは<code>192</code>となります。"
+        "description": "横ピクセル下限を設定します。デフォルトは<code>192</code>となります。cameraModeが<code>SKW_CAMERA_MODE_ADJUSTABLE</code>の時にのみ有効です。"
       },
       {
         "name": "maxHeight",
         "type": "NSUInteger",
-        "description": "縦ピクセル上限を設定します。デフォルトは<code>480</code>となります。"
+        "description": "縦ピクセル上限を設定します。デフォルトは<code>480</code>となります。cameraModeが<code>SKW_CAMERA_MODE_ADJUSTABLE</code>の時にのみ有効です。"
       },
       {
         "name": "minHeight",
         "type": "NSUInteger",
-        "description": "縦ピクセル下限を設定します。デフォルトは<code>144</code>となります。"
-      },
-      {
-        "name": "maxFrameRate",
-        "type": "NSUInteger",
-        "description": "フレームレート上限を設定します。2〜30を指定することができます。デフォルトは<code>10</code>となります。"
-      },
-      {
-        "name": "minFrameRate",
-        "type": "NSUInteger",
-        "description": "フレームレート下限を設定します。2〜30を指定することができます。デフォルトは<code>2</code>となります。"
+        "description": "縦ピクセル下限を設定します。デフォルトは<code>144</code>となります。cameraModeが<code>SKW_CAMERA_MODE_ADJUSTABLE</code>の時にのみ有効です。"
       }
     ]
   }
