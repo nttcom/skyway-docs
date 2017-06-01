@@ -61,7 +61,7 @@
 ####[参考]プログラム言語毎のデータ型対応表
 
 |表上の表記|文字列|数値|配列|連想配列|バイナリ|
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|:---:|:---:|:---:|:---:|:---:|:---:|
 |Android|String|Short Integer Long Float Double|Array|Map|byte[] ByteBuffer|
 |iOS|NSString|NSNumber|NSArray|NSDictionary|NSData|
 |JS|string|number|array|object|ArrayBuffer|
