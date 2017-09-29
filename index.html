@@ -11,6 +11,49 @@
 </head>
 
 <body>
+<div id="warn">
+    <div>
+        <h1>Deprecated!</h1>
+        <p>このドキュメントは、2018年3月に提供を終了するSkyWayの旧SDKのAPIリファレンスです。<br>
+            旧SDKをご利用の方は、<a href="#">新SDK</a>への移行をお願いします。
+            新SDKをご利用の方は、<a href="#">新SDKのAPIリファレンス</a>をご覧ください。
+        </p><a href="#" id="btn-close">×</a>
+    </div>
+</div>
+<script>
+    $('#btn-close').click(function(e) {
+        e.preventDefault();
+        $('#warn').css({ height: 0 });
+        $('.api, .start').css({ top: '78px' });
+    });
+</script>
+<style>
+    #warn {
+        height: 160px;
+        color: #fff;
+        background-color: #e2a62e;
+        padding: 0px 30px;
+        display: flex;
+        align-items: center;
+        text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.2);
+        transition: height 300ms;
+        overflow: hidden;
+        position: relative;
+    }
+    .api, .start {
+        top: 238px;
+        transition: left 300ms, top 300ms;
+        z-index: 95;
+    }
+    #btn-close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+    a#btn-close, a#btn-close:hover, a#btn-close:active {
+        color: #fff;
+    }
+</style>
 <div id="tab-controll">
   <ul id="tab">
   <li><a href="#JS" class="active">JavaScript</a></li>
